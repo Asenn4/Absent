@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-dotenv
+numpy
+opencv-python
+onnxruntime
+deepface
+mysql-connector-python
+PyMySQL
+psutil
