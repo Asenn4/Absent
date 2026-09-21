@@ -1,10 +1,6 @@
 fastapi
 uvicorn
-python-dotenv
+python-multipart
 numpy
 opencv-python
 onnxruntime
-deepface
-mysql-connector-python
-PyMySQL
-psutil
