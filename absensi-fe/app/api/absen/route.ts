@@ -1,5 +1,8 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { writeFile, mkdir } from "fs/promises";
+import { join } from "path";
+import { existsSync } from "fs";
 
 // Fungsi untuk menghitung Cosine Similarity
 function cosineSimilarity(vecA: number[], vecB: number[]) {
@@ -82,15 +85,43 @@ export async function POST(request: NextRequest) {
 
     // Jika wajah cocok (skor melebihi batas)
     if (similarityScore >= THRESHOLD) {
-      // 4. Catat Kehadiran
+      // 4. Catat Kehadiran dan Simpan Foto
       const now = new Date();
-      const hours = now.getHours();
       
-      // Logika sederhana: jika sebelum jam 9 pagi, maka "Hadir", selain itu "Terlambat"
+      // Simpan foto bukti absen secara fisik
+      const bytes = await photo.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const filename = `absen-${user.id}-${Date.now()}.jpg`;
+      const uploadDir = join(process.cwd(), "public", "uploads", "absen");
+      
+      if (!existsSync(uploadDir)) {
+        await mkdir(uploadDir, { recursive: true });
+      }
+      
+      const photoPath = join(uploadDir, filename);
+      await writeFile(photoPath, buffer);
+      const photoUrl = `/uploads/absen/${filename}`;
+
+      // Pastikan perhitungan jam menggunakan zona waktu lokal WIB (Asia/Jakarta)
+      const jakartaTimeStr = now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
+      const jakartaTime = new Date(jakartaTimeStr);
+      const hours = jakartaTime.getHours();
+      
       let status = "Hadir";
-      if (scanMode === "checkIn" && hours >= 9) {
-        status = "Terlambat";
+      if (scanMode === "checkIn") {
+        if (hours >= 9) {
+          status = "Terlambat";
+        } else {
+          status = "Hadir";
+        }
       } else if (scanMode === "checkOut") {
+        // Opsi A: Dilarang absen pulang sebelum jam 15:00 WIB
+        if (hours < 15) {
+          return NextResponse.json(
+            { error: "BELUM WAKTUNYA PULANG" },
+            { status: 400 }
+          );
+        }
         status = "Pulang";
       }
 
@@ -99,7 +130,8 @@ export async function POST(request: NextRequest) {
           user_id: user.id,
           device_loc: "Gate A",
           status: status,
-          confidence_score: similarityScore
+          confidence_score: similarityScore,
+          photo_url: photoUrl
         }
       });
 

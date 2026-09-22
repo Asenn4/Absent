@@ -28,14 +28,20 @@ export default function MyHistoryPage() {
       .then(res => {
         if (res.success) {
           // Format data
-          const formatted = res.data.map((log: any) => ({
-            id: log.id,
-            date: new Date(log.scan_time).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' }),
-            checkIn: new Date(log.scan_time).toLocaleTimeString('id-ID', { hour12: false }),
-            checkOut: "-", // Simplified since we only record 1 scan for now
-            status: log.status,
-            device: log.device_loc
-          }));
+          const formatted = res.data.map((log: any) => {
+            const time = new Date(log.scan_time).toLocaleTimeString('id-ID', { hour12: false });
+            const isCheckOut = log.status === "Pulang";
+            
+            return {
+              id: log.id,
+              date: new Date(log.scan_time).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' }),
+              checkIn: isCheckOut ? "-" : time,
+              checkOut: isCheckOut ? time : "-",
+              status: log.status,
+              device: log.device_loc,
+              photoUrl: log.photo_url
+            };
+          });
           setLogs(formatted);
         }
       })

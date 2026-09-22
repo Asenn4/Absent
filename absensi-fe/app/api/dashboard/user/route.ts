@@ -26,9 +26,19 @@ export async function GET(request: NextRequest) {
     
     userAbsen.forEach(record => {
       const dateObj = new Date(record.scan_time);
-      const rawDate = dateObj.toISOString().split('T')[0]; // Format YYYY-MM-DD
-      const displayDate = dateObj.toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' });
-      const timeStr = dateObj.toLocaleTimeString('id-ID', { hour12: false });
+      
+      // Ambil waktu lokal Jakarta untuk menghindari bug beda hari di server UTC
+      const jakartaTimeStr = dateObj.toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
+      const jakartaTime = new Date(jakartaTimeStr);
+      
+      const year = jakartaTime.getFullYear();
+      const month = String(jakartaTime.getMonth() + 1).padStart(2, '0');
+      const day = String(jakartaTime.getDate()).padStart(2, '0');
+      const rawDate = `${year}-${month}-${day}`; // Format YYYY-MM-DD aman
+      
+      const displayDate = jakartaTime.toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' });
+      // Gunakan en-GB agar format jam konsisten memakai titik dua (:) misal 09:00:00
+      const timeStr = jakartaTime.toLocaleTimeString('en-GB', { hour12: false });
 
       if (!groupedAbsen.has(rawDate)) {
         groupedAbsen.set(rawDate, {

@@ -187,6 +187,14 @@ export default function UserDashboard() {
                         <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 font-bold border border-yellow-200">
                           {log.status}
                         </Badge>
+                      ) : log.status === "Izin" ? (
+                        <Badge variant="secondary" className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 font-bold border border-indigo-200">
+                          {log.status}
+                        </Badge>
+                      ) : log.status === "Sakit" ? (
+                        <Badge variant="secondary" className="bg-pink-100 text-pink-800 hover:bg-pink-200 font-bold border border-pink-200">
+                          {log.status}
+                        </Badge>
                       ) : (
                         <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200 font-bold border border-green-200">
                           {log.status}

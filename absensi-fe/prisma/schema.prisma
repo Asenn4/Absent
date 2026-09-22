@@ -28,6 +28,7 @@ model Absen {
   device_loc       String
   status           String   // "Hadir", "Terlambat", "Alpa"
   confidence_score Float
+  photo_url        String?  // Untuk menyimpan URL foto hasil absen
   
   user             User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 

@@ -123,7 +123,12 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
                   if (onLog) onLog(scanMode, data.user.name, data.status);
                 }, 2000);
               } else {
-                setStatusMessage("TIDAK DIKENALI");
+                try {
+                  const errorData = await response.json();
+                  setStatusMessage(errorData.error ? errorData.error.toUpperCase() : "TIDAK DIKENALI");
+                } catch {
+                  setStatusMessage("TIDAK DIKENALI");
+                }
               }
             } catch (error) {
               console.error(error);
