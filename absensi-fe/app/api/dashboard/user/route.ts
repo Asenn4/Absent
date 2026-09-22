@@ -14,25 +14,54 @@ export async function GET(request: NextRequest) {
 
     const userAbsen = await prisma.absen.findMany({
       where: { user_id: userId },
-      orderBy: { scan_time: 'desc' }
+      orderBy: { scan_time: 'asc' } // Urutkan dari lama ke baru agar check-in didapat pertama
     });
 
     const isVerified = await prisma.faceRegistration.findFirst({
       where: { user_id: userId, status: "approved" }
     });
 
+    // Grouping berdasarkan tanggal
+    const groupedAbsen = new Map<string, any>();
+    
+    userAbsen.forEach(record => {
+      const dateObj = new Date(record.scan_time);
+      const rawDate = dateObj.toISOString().split('T')[0]; // Format YYYY-MM-DD
+      const displayDate = dateObj.toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' });
+      const timeStr = dateObj.toLocaleTimeString('id-ID', { hour12: false });
+
+      if (!groupedAbsen.has(rawDate)) {
+        groupedAbsen.set(rawDate, {
+          id: record.id,
+          rawDate: rawDate,
+          date: displayDate,
+          checkIn: timeStr,
+          checkOut: "-",
+          status: record.status // Gunakan status scan pertama
+        });
+      } else {
+        const existing = groupedAbsen.get(rawDate);
+        existing.checkOut = timeStr; // Update dengan scan terakhir (jika > 1 kali scan)
+      }
+    });
+
     // Kalkulasi persentase kehadiran bulan ini
-    // Sederhananya kita asumsikan 90% (dummy) jika data belum banyak, atau hitung riil:
-    const presentCount = userAbsen.filter(a => a.status === "Hadir").length;
+    // Menggunakan jumlah hari unik di mana user absen
+    const presentCount = groupedAbsen.size;
     // Misalnya total hari kerja sebulan 20 hari
     const attendanceRate = Math.min(100, Math.round((presentCount / 20) * 100)) || 0;
+
+    // Urutkan menjadi dari terbaru ke terlama dan ambil 5 teratas
+    const historyArray = Array.from(groupedAbsen.values())
+      .sort((a, b) => b.rawDate.localeCompare(a.rawDate))
+      .slice(0, 5);
 
     return NextResponse.json({
       success: true,
       data: {
         attendanceRate,
         isVerified: !!isVerified,
-        history: userAbsen.slice(0, 5) // Ambil 5 riwayat terakhir untuk dashboard
+        history: historyArray
       }
     });
   } catch (error) {

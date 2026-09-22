@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface LiveCameraProps {
-  onLog?: (mode: "checkIn" | "checkOut", name: string) => void;
+  onLog?: (mode: "checkIn" | "checkOut", name: string, status?: string) => void;
 }
 
 export function LiveCamera({ onLog }: LiveCameraProps = {}) {
@@ -120,7 +120,7 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
                 
                 // Beri waktu membaca nama sebelum memanggil onLog
                 setTimeout(() => {
-                  if (onLog) onLog(scanMode, data.user.name);
+                  if (onLog) onLog(scanMode, data.user.name, data.status);
                 }, 2000);
               } else {
                 setStatusMessage("TIDAK DIKENALI");

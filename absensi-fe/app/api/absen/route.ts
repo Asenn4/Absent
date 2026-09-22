@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       
       // Logika sederhana: jika sebelum jam 8 pagi, maka "Hadir", selain itu "Terlambat"
       let status = "Hadir";
-      if (scanMode === "checkIn" && hours >= 8) {
+      if (scanMode === "checkIn" && hours >= 9) {
         status = "Terlambat";
       } else if (scanMode === "checkOut") {
         status = "Pulang";
@@ -104,7 +104,8 @@ export async function POST(request: NextRequest) {
         success: true, 
         message: "Wajah dikenali", 
         user: { name: bestMatch.nama },
-        score: highestScore 
+        score: highestScore,
+        status: status
       });
 
     } else {

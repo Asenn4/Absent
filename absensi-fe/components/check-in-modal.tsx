@@ -7,12 +7,12 @@ import { ScanFace } from "lucide-react";
 interface CheckInModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLog: (mode: "checkIn" | "checkOut", name: string) => void;
+  onLog: (mode: "checkIn" | "checkOut", name: string, status?: string) => void;
 }
 
 export function CheckInModal({ isOpen, onClose, onLog }: CheckInModalProps) {
-  const handleLog = (mode: "checkIn" | "checkOut", name: string) => {
-    onLog(mode, name);
+  const handleLog = (mode: "checkIn" | "checkOut", name: string, status?: string) => {
+    onLog(mode, name, status);
     // Optional: Close modal automatically after successful scan
     setTimeout(() => {
       onClose();

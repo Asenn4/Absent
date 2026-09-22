@@ -32,9 +32,9 @@ export default function UserDashboard() {
           // Format history
           const formattedLogs = res.data.history.map((log: any) => ({
             id: log.id,
-            date: new Date(log.scan_time).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' }),
-            checkIn: new Date(log.scan_time).toLocaleTimeString('id-ID', { hour12: false }),
-            checkOut: "-",
+            date: log.date,
+            checkIn: log.checkIn,
+            checkOut: log.checkOut,
             status: log.status
           }));
           setLogs(formattedLogs);
@@ -43,7 +43,7 @@ export default function UserDashboard() {
       .catch(console.error);
   }, []);
 
-  const handleScan = (mode: "checkIn" | "checkOut", name: string) => {
+  const handleScan = (mode: "checkIn" | "checkOut", name: string, computedStatus?: string) => {
     const today = new Date().toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' });
     const now = new Date().toLocaleTimeString('id-ID', { hour12: false });
 
@@ -56,8 +56,10 @@ export default function UserDashboard() {
         
         if (mode === "checkIn" && (!log.checkIn || log.checkIn === "-")) {
           log.checkIn = now;
+          if (computedStatus) log.status = computedStatus; // Update status to computed status
         } else if (mode === "checkOut") {
           log.checkOut = now;
+          // Don't overwrite the existing status (Hadir/Terlambat) on checkOut
         }
         
         newLogs[todayLogIndex] = log;
@@ -68,7 +70,7 @@ export default function UserDashboard() {
           date: today,
           checkIn: mode === "checkIn" ? now : "-",
           checkOut: mode === "checkOut" ? now : "-",
-          status: "Hadir"
+          status: computedStatus || "Hadir"
         };
         return [newLog, ...prev];
       }
@@ -120,7 +122,7 @@ export default function UserDashboard() {
               {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })}
             </div>
             <div className="flex items-center gap-4 mt-2">
-              <div className="text-xs font-medium text-slate-500">Masuk: <span className="font-bold text-blue-700">07:00</span></div>
+              <div className="text-xs font-medium text-slate-500">Masuk: <span className="font-bold text-blue-700">09:00</span></div>
               <div className="text-xs font-medium text-slate-500">Pulang: <span className="font-bold text-blue-700">15:00</span></div>
             </div>
           </CardContent>
