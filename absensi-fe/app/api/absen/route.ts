@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 // Fungsi untuk menghitung Cosine Similarity
@@ -25,6 +25,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No photo provided" }, { status: 400 });
     }
 
+    // Ambil ID pengguna yang sedang login dari Cookie
+    const userIdCookie = request.cookies.get("user_id");
+    const loggedInUserId = userIdCookie?.value;
+
+    if (!loggedInUserId) {
+      return NextResponse.json({ error: "Sesi login tidak valid. Harap login ulang." }, { status: 401 });
+    }
+
     // 1. Minta FastAPI untuk mengekstrak vektor wajah dari gambar
     const fastApiFormData = new FormData();
     fastApiFormData.append("file", photo, "capture.jpg");
@@ -45,45 +53,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Wajah tidak terdeteksi oleh sistem." }, { status: 400 });
     }
 
-    // 2. Tarik semua pengguna yang sudah mendaftarkan wajahnya
-    const users = await prisma.user.findMany({
-      where: {
-        face_embed: {
-          not: null
-        }
-      }
+    // 2. Tarik data PENGGUNA YANG SEDANG LOGIN SAJA (Verifikasi 1:1)
+    const user = await prisma.user.findUnique({
+      where: { id: loggedInUserId }
     });
 
-    if (users.length === 0) {
-      return NextResponse.json({ error: "Belum ada pengguna yang terdaftar di database." }, { status: 404 });
+    if (!user) {
+      return NextResponse.json({ error: "Akun pengguna tidak ditemukan." }, { status: 404 });
+    }
+    
+    if (!user.face_embed) {
+      return NextResponse.json({ error: "Anda belum mendaftarkan data wajah Anda di sistem." }, { status: 403 });
     }
 
-    // 3. Bandingkan vektor (Cosine Similarity)
-    let bestMatch = null;
-    let highestScore = 0;
-    const THRESHOLD = 0.5; // Ambang batas kemiripan, bisa disesuaikan
+    // 3. Bandingkan vektor wajah di kamera dengan wajah asli milik akun (Cosine Similarity)
+    let similarityScore = 0;
+    const THRESHOLD = 0.5; // Ambang batas kemiripan minimal
 
-    for (const user of users) {
-      try {
-        const userVector = JSON.parse(user.face_embed!);
-        if (Array.isArray(userVector) && userVector.length === embedding.length) {
-          const score = cosineSimilarity(embedding, userVector);
-          if (score > highestScore) {
-            highestScore = score;
-            bestMatch = user;
-          }
-        }
-      } catch (e) {
-        console.error("Gagal memparsing vektor untuk user:", user.id);
+    try {
+      const userVector = JSON.parse(user.face_embed);
+      if (Array.isArray(userVector) && userVector.length === embedding.length) {
+        similarityScore = cosineSimilarity(embedding, userVector);
       }
+    } catch (e) {
+      console.error("Gagal memparsing vektor untuk user:", user.id);
+      return NextResponse.json({ error: "Data wajah internal rusak." }, { status: 500 });
     }
 
-    if (bestMatch && highestScore >= THRESHOLD) {
+    // Jika wajah cocok (skor melebihi batas)
+    if (similarityScore >= THRESHOLD) {
       // 4. Catat Kehadiran
       const now = new Date();
       const hours = now.getHours();
       
-      // Logika sederhana: jika sebelum jam 8 pagi, maka "Hadir", selain itu "Terlambat"
+      // Logika sederhana: jika sebelum jam 9 pagi, maka "Hadir", selain itu "Terlambat"
       let status = "Hadir";
       if (scanMode === "checkIn" && hours >= 9) {
         status = "Terlambat";
@@ -93,23 +96,24 @@ export async function POST(request: NextRequest) {
 
       const absenRecord = await prisma.absen.create({
         data: {
-          user_id: bestMatch.id,
+          user_id: user.id,
           device_loc: "Gate A",
           status: status,
-          confidence_score: highestScore
+          confidence_score: similarityScore
         }
       });
 
       return NextResponse.json({ 
         success: true, 
         message: "Wajah dikenali", 
-        user: { name: bestMatch.nama },
-        score: highestScore,
+        user: { name: user.nama },
+        score: similarityScore,
         status: status
       });
 
     } else {
-      return NextResponse.json({ error: "Wajah tidak dikenali. Silakan coba lagi." }, { status: 401 });
+      // Wajah yang disorot kamera BUKAN pemilik akun!
+      return NextResponse.json({ error: "Wajah tidak cocok dengan pemilik akun ini! Akses ditolak." }, { status: 403 });
     }
 
   } catch (error: any) {
