@@ -144,8 +144,8 @@ export async function POST(request: NextRequest) {
           status = "Hadir";
         }
       } else if (scanMode === "checkOut") {
-        // Opsi A: Dilarang absen pulang sebelum jam 15:00 WIB
-        if (hours < 16) {
+        // Opsi A: Dilarang absen pulang sebelum jam 16:00 WIB
+        if (hours < 11) {
           return NextResponse.json(
             { error: "BELUM WAKTUNYA PULANG" },
             { status: 400 }
