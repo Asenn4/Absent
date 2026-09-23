@@ -123,7 +123,7 @@ export default function UserDashboard() {
             </div>
             <div className="flex items-center gap-4 mt-2">
               <div className="text-xs font-medium text-slate-500">Masuk: <span className="font-bold text-blue-700">09:00</span></div>
-              <div className="text-xs font-medium text-slate-500">Pulang: <span className="font-bold text-blue-700">15:00</span></div>
+              <div className="text-xs font-medium text-slate-500">Pulang: <span className="font-bold text-blue-700">16:00</span></div>
             </div>
           </CardContent>
         </Card>

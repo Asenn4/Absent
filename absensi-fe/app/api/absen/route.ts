@@ -87,6 +87,35 @@ export async function POST(request: NextRequest) {
     if (similarityScore >= THRESHOLD) {
       // 4. Catat Kehadiran dan Simpan Foto
       const now = new Date();
+
+      // CEK APAKAH SUDAH ABSEN HARI INI
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const recentAbsen = await prisma.absen.findMany({
+        where: { 
+          user_id: user.id,
+          scan_time: { gte: yesterday }
+        }
+      });
+
+      const currentJakartaDate = now.toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta" });
+      const todayAbsen = recentAbsen.filter(record => {
+         const recordDate = new Date(record.scan_time).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta" });
+         return recordDate === currentJakartaDate;
+      });
+
+      if (scanMode === "checkIn") {
+         const hasCheckedIn = todayAbsen.some(a => a.status !== "Pulang");
+         if (hasCheckedIn) {
+            return NextResponse.json({ error: "SUDAH ABSEN MASUK HARI INI" }, { status: 400 });
+         }
+      } else if (scanMode === "checkOut") {
+         const hasCheckedOut = todayAbsen.some(a => a.status === "Pulang");
+         if (hasCheckedOut) {
+            return NextResponse.json({ error: "SUDAH ABSEN KELUAR HARI INI" }, { status: 400 });
+         }
+      }
       
       // Simpan foto bukti absen secara fisik
       const bytes = await photo.arrayBuffer();
@@ -116,7 +145,7 @@ export async function POST(request: NextRequest) {
         }
       } else if (scanMode === "checkOut") {
         // Opsi A: Dilarang absen pulang sebelum jam 15:00 WIB
-        if (hours < 15) {
+        if (hours < 16) {
           return NextResponse.json(
             { error: "BELUM WAKTUNYA PULANG" },
             { status: 400 }

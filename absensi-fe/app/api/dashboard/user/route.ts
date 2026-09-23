@@ -45,13 +45,22 @@ export async function GET(request: NextRequest) {
           id: record.id,
           rawDate: rawDate,
           date: displayDate,
-          checkIn: timeStr,
+          checkIn: "-",
           checkOut: "-",
-          status: record.status // Gunakan status scan pertama
+          status: "-" // Will be updated by check-in
         });
+      }
+      
+      const existing = groupedAbsen.get(rawDate);
+      
+      if (record.status === "Pulang") {
+        existing.checkOut = timeStr; // Update dengan waktu pulang
       } else {
-        const existing = groupedAbsen.get(rawDate);
-        existing.checkOut = timeStr; // Update dengan scan terakhir (jika > 1 kali scan)
+        // Asumsikan status selain Pulang adalah absen masuk (Hadir, Terlambat, dll)
+        if (existing.checkIn === "-") {
+          existing.checkIn = timeStr;
+          existing.status = record.status; // Gunakan status scan masuk
+        }
       }
     });
 

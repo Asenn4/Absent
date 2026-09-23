@@ -27,22 +27,44 @@ export default function MyHistoryPage() {
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          // Format data
-          const formatted = res.data.map((log: any) => {
+          // Group data berdasarkan tanggal agar Masuk dan Keluar ada di satu baris
+          const groupedByDate: Record<string, any> = {};
+
+          res.data.forEach((log: any) => {
+            const dateStr = new Date(log.scan_time).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' });
             const time = new Date(log.scan_time).toLocaleTimeString('id-ID', { hour12: false });
             const isCheckOut = log.status === "Pulang";
             
-            return {
-              id: log.id,
-              date: new Date(log.scan_time).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' }),
-              checkIn: isCheckOut ? "-" : time,
-              checkOut: isCheckOut ? time : "-",
-              status: log.status,
-              device: log.device_loc,
-              photoUrl: log.photo_url
-            };
+            if (!groupedByDate[dateStr]) {
+              groupedByDate[dateStr] = {
+                id: log.id,
+                date: dateStr,
+                checkIn: "-",
+                checkOut: "-",
+                status: log.status,
+                device: log.device_loc,
+                photoUrl: log.photo_url
+              };
+            }
+
+            if (isCheckOut) {
+              // Data dari backend sudah diurutkan dari yang terbaru (DESC)
+              // Keluar (Pulang) pertama yang ditemui adalah yang paling akhir
+              if (groupedByDate[dateStr].checkOut === "-") {
+                groupedByDate[dateStr].checkOut = time;
+              }
+            } else {
+              // Terus menimpa waktu checkIn karena kita iterasi mundur ke masa lalu,
+              // sehingga akhirnya kita mendapatkan waktu check-in yang paling AWAL di hari tersebut
+              groupedByDate[dateStr].checkIn = time;
+              groupedByDate[dateStr].status = log.status; // Gunakan status saat masuk (Hadir/Terlambat/dll)
+              groupedByDate[dateStr].device = log.device_loc;
+              groupedByDate[dateStr].photoUrl = log.photo_url;
+              groupedByDate[dateStr].id = log.id;
+            }
           });
-          setLogs(formatted);
+          
+          setLogs(Object.values(groupedByDate));
         }
       })
       .finally(() => setLoading(false));
