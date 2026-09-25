@@ -4,7 +4,7 @@ import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
 
-// Fungsi untuk menghitung Cosine Similarity
+// Fungsi untuk menghitung Cosine Similarity antara dua vektor
 function cosineSimilarity(vecA: number[], vecB: number[]) {
   let dotProduct = 0;
   let normA = 0;
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Foto tidak tersedia / belum diambil" }, { status: 400 });
     }
 
-    // 1. Ekstrak vektor wajah melalui FastAPI
+    // 1. Ekstrak vektor embedding wajah dari FastAPI
     const fastApiFormData = new FormData();
     fastApiFormData.append("file", photo, "capture.jpg");
 
@@ -39,22 +39,22 @@ export async function POST(request: NextRequest) {
         body: fastApiFormData,
       });
     } catch (netErr: any) {
-      console.error("FastAPI connection error:", netErr);
-      return NextResponse.json({ error: "Gagal terhubung ke engine AI (FastAPI offline)" }, { status: 503 });
+      console.error("FastAPI offline / connection error:", netErr);
+      return NextResponse.json({ error: "Mesin AI FastAPI tidak aktif di port 8000." }, { status: 503 });
     }
 
     if (!fastApiResponse.ok) {
       const errorText = await fastApiResponse.text();
-      return NextResponse.json({ error: "Gagal memproses wajah: " + errorText }, { status: 400 });
+      return NextResponse.json({ error: "Wajah tidak terdeteksi oleh sistem AI." }, { status: 400 });
     }
 
     const { embedding } = await fastApiResponse.json();
 
     if (!embedding || !Array.isArray(embedding) || embedding.length === 0) {
-      return NextResponse.json({ error: "Wajah tidak terdeteksi oleh sistem." }, { status: 400 });
+      return NextResponse.json({ error: "Wajah tidak terdeteksi pada kamera." }, { status: 400 });
     }
 
-    // 2. Ambil seluruh data pengguna yang sudah memiliki data vektor wajah (1:N Matching Kiosk)
+    // 2. Ambil seluruh data pengguna yang telah memiliki vektor wajah (1:N Matching Kiosk)
     const registeredUsers = await prisma.user.findMany({
       where: {
         face_embed: {
@@ -70,13 +70,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (registeredUsers.length === 0) {
-      return NextResponse.json({ error: "Belum ada data wajah yang terdaftar di database." }, { status: 400 });
+      return NextResponse.json({ error: "Belum ada wajah pengguna yang terdaftar di database." }, { status: 400 });
     }
 
-    // 3. Bandingkan vektor wajah kamera dengan seluruh pengguna (Cari skor tertinggi)
+    // 3. Cari pengguna dengan tingkat kecocokan tertinggi
     let bestUser: typeof registeredUsers[0] | null = null;
     let bestScore = -1;
-    const THRESHOLD = 0.50; // Ambang batas kemiripan minimal
+    const THRESHOLD = 0.45; // Ambang batas kemiripan aman & responsif
 
     for (const u of registeredUsers) {
       try {
@@ -94,15 +94,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Jika tidak ada wajah yang melampaui batas kecocokan
+    // Jika kemiripan tidak melampaui batas minimal
     if (!bestUser || bestScore < THRESHOLD) {
       return NextResponse.json({
-        error: "Wajah tidak dikenali atau belum terdaftar di sistem!",
+        error: "Wajah tidak cocok dengan data pengguna manapun atau belum terdaftar!",
         bestScore: bestScore > 0 ? Number(bestScore.toFixed(3)) : 0
       }, { status: 403 });
     }
 
-    // 4. Pengguna Cocok -> Validasi Aturan Absensi Hari Ini
+    // 4. Validasi Kehadiran Hari Ini
     const now = new Date();
     const yesterday = new Date(now);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -120,19 +120,42 @@ export async function POST(request: NextRequest) {
        return recordDate === currentJakartaDate;
     });
 
+    // Jika sudah absen masuk hari ini: Kembalikan status sukses (agar demo tidak error)
     if (scanMode === "checkIn") {
-       const hasCheckedIn = todayAbsen.some(a => a.status !== "Pulang");
-       if (hasCheckedIn) {
-          return NextResponse.json({ error: `${bestUser.nama} SUDAH ABSEN MASUK HARI INI` }, { status: 400 });
+       const existingCheckIn = todayAbsen.find(a => a.status !== "Pulang");
+       if (existingCheckIn) {
+          return NextResponse.json({ 
+            success: true, 
+            alreadyChecked: true,
+            message: `${bestUser.nama} sudah tercatat absen masuk hari ini`, 
+            user: { 
+              id: bestUser.id,
+              name: bestUser.nama,
+              email: bestUser.email
+            },
+            score: Number(bestScore.toFixed(3)),
+            status: existingCheckIn.status
+          });
        }
     } else if (scanMode === "checkOut") {
-       const hasCheckedOut = todayAbsen.some(a => a.status === "Pulang");
-       if (hasCheckedOut) {
-          return NextResponse.json({ error: `${bestUser.nama} SUDAH ABSEN KELUAR HARI INI` }, { status: 400 });
+       const existingCheckOut = todayAbsen.find(a => a.status === "Pulang");
+       if (existingCheckOut) {
+          return NextResponse.json({ 
+            success: true, 
+            alreadyChecked: true,
+            message: `${bestUser.nama} sudah tercatat absen keluar hari ini`, 
+            user: { 
+              id: bestUser.id,
+              name: bestUser.nama,
+              email: bestUser.email
+            },
+            score: Number(bestScore.toFixed(3)),
+            status: "Pulang"
+          });
        }
     }
 
-    // 5. Simpan foto bukti absen secara fisik
+    // 5. Simpan foto bukti fisik
     const bytes = await photo.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const filename = `absen-${bestUser.id}-${Date.now()}.jpg`;
@@ -159,13 +182,6 @@ export async function POST(request: NextRequest) {
         status = "Hadir";
       }
     } else if (scanMode === "checkOut") {
-      // Dilarang absen pulang sebelum jam 11:00 WIB
-      if (hours < 11) {
-        return NextResponse.json(
-          { error: "BELUM WAKTUNYA PULANG (MINIMAL JAM 11:00 WIB)" },
-          { status: 400 }
-        );
-      }
       status = "Pulang";
     }
 
@@ -189,7 +205,8 @@ export async function POST(request: NextRequest) {
         email: bestUser.email
       },
       score: Number(bestScore.toFixed(3)),
-      status: status
+      status: status,
+      alreadyChecked: false
     });
 
   } catch (error: any) {

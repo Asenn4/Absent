@@ -28,7 +28,7 @@ def home():
     return {"message": "API Jetson Attend Backend Aktif dan Siap Menerima Foto."}
 
 @app.post("/api/train-face")
-async def train_face(file: UploadFile = File(...)):
+def train_face(file: UploadFile = File(...)):
     # 1. Simpan foto yang dikirim dari browser ke file sementara
     temp_file = f"temp_{file.filename}"
     with open(temp_file, "wb") as buffer:
