@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-provider";
-import { LayoutDashboard, Users, FileText, CalendarCheck, ShieldCheck, LogOut, Camera } from "lucide-react";
+import { LayoutDashboard, Users, FileText, CalendarCheck, ShieldCheck, LogOut, Camera, ScanFace } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,7 @@ const adminLinks = [
   { name: "Data Master", href: "/admin/master-data", icon: Users },
   { name: "Verifikasi Wajah", href: "/admin/face-verification", icon: Camera },
   { name: "Log Global", href: "/admin/logs", icon: FileText },
+  { name: "Terminal Kiosk", href: "/", icon: ScanFace },
 ];
 
 const userLinks = [

@@ -71,6 +71,17 @@ export default function KioskPage() {
     }
   }, []);
 
+  // Pastikan terminal kiosk publik selalu bebas dari sesi login admin (mencegah rollback ke admin)
+  useEffect(() => {
+    const cookies = document.cookie.split(';');
+    const hasAuth = cookies.some(c => c.trim().startsWith('auth_role=') || c.trim().startsWith('user_id='));
+    if (hasAuth) {
+      document.cookie = "auth_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    }
+  }, []);
+
   // Update Jam & Tanggal Digital Real-Time
   useEffect(() => {
     const updateTime = () => {
