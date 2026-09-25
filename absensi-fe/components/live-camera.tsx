@@ -83,7 +83,7 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
     if (isSuccess) return;
 
     const scanInterval = setInterval(async () => {
-      if (!videoRef.current || !canvasRef.current || isScanning) return;
+      if (!videoRef.current || !canvasRef.current || isScanning || isSuccess) return;
       
       const video = videoRef.current;
       if (video.readyState !== 4) return; // Tunggu video siap
@@ -115,13 +115,19 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
 
               if (response.ok) {
                 const data = await response.json();
-                setStatusMessage(`COCOK: ${data.user.name}`);
+                setStatusMessage(`COCOK: ${data.user.name} (${data.status})`);
                 setIsSuccess(true);
                 
-                // Beri waktu membaca nama sebelum memanggil onLog
+                if (onLog) {
+                  onLog(scanMode, data.user.name, data.status);
+                }
+
+                // Auto reset 3.5 detik agar siap untuk orang berikutnya (Kiosk mode)
                 setTimeout(() => {
-                  if (onLog) onLog(scanMode, data.user.name, data.status);
-                }, 2000);
+                  setIsSuccess(false);
+                  setStatusMessage("MENUNGGU SUBJEK");
+                }, 3500);
+
               } else {
                 try {
                   const errorData = await response.json();
@@ -129,11 +135,19 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
                 } catch {
                   setStatusMessage("TIDAK DIKENALI");
                 }
+                
+                setTimeout(() => {
+                  setStatusMessage(prev => prev.startsWith("COCOK") ? prev : "MENUNGGU SUBJEK");
+                }, 2500);
               }
             } catch (error) {
               console.error(error);
               setLatency(Math.round(performance.now() - startTime));
               setStatusMessage("ERROR JARINGAN");
+
+              setTimeout(() => {
+                setStatusMessage("MENUNGGU SUBJEK");
+              }, 2500);
             }
           }
           setIsScanning(false);
@@ -196,13 +210,13 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
           )}
 
           {/* Overlay Status */}
-          <div className="absolute z-20 backdrop-blur-sm bg-black/20 px-6 py-4 rounded-2xl border border-white/5 flex flex-col items-center gap-3 pointer-events-none">
+          <div className="absolute z-20 backdrop-blur-sm bg-black/40 px-6 py-4 rounded-2xl border border-white/10 flex flex-col items-center gap-3 pointer-events-none">
              {isSuccess ? (
                 <CheckCircle2 className="w-12 h-12 text-green-400 animate-pulse drop-shadow-[0_0_8px_rgba(74,222,128,0.5)]" />
              ) : (
                 <ScanFace className={cn("w-12 h-12 transition-all duration-500", isScanning ? "text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse scale-110" : "text-blue-200/40")} />
              )}
-             <p className={cn("text-xs font-mono tracking-widest font-bold drop-shadow-md", isSuccess ? "text-green-400" : (isScanning ? "text-blue-300" : "text-white/80"))}>
+             <p className={cn("text-xs font-mono tracking-widest font-bold drop-shadow-md text-center", isSuccess ? "text-green-400" : (isScanning ? "text-blue-300" : "text-white/80"))}>
                 {statusMessage}
              </p>
           </div>

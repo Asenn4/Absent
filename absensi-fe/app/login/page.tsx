@@ -130,8 +130,11 @@ export default function LoginPage() {
             </p>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-center border-t border-slate-100 pt-6 pb-6">
-          <p className="text-xs text-slate-400">
+        <CardFooter className="flex flex-col gap-2 items-center border-t border-slate-100 pt-4 pb-6">
+          <Link href="/" className="text-xs text-blue-600 hover:text-blue-700 font-medium hover:underline flex items-center gap-1">
+            ← Kembali ke Terminal Absensi (Kiosk)
+          </Link>
+          <p className="text-[11px] text-slate-400">
             Sistem didukung oleh Jetson Nano AI
           </p>
         </CardFooter>
