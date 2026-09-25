@@ -178,7 +178,7 @@ export default function KioskPage() {
                 TERMINAL KIOSK
               </span>
             </div>
-            <p className="text-xs text-blue-600/70 font-medium">Sistem Presensi Pengenalan Wajah AI</p>
+            <p className="text-xs text-blue-600/70 font-medium">Terminal Presensi Wajah AI</p>
           </div>
         </div>
 
@@ -196,7 +196,7 @@ export default function KioskPage() {
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-blue-500/20 transition-all duration-200 group active:scale-95"
           >
             <LogIn className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            <span>Portal Siswa / Admin</span>
+            <span>Login Admin</span>
           </Link>
         </div>
       </header>

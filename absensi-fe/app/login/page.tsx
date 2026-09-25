@@ -52,10 +52,10 @@ export default function LoginPage() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-slate-800 tracking-tight">
-            Jetson Attendance
+            Portal Administrator
           </CardTitle>
           <CardDescription className="text-slate-500">
-            Masuk untuk mengakses dashboard Anda
+            Masuk untuk mengelola master data siswa & presensi AI
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -125,8 +125,8 @@ export default function LoginPage() {
             <p className="text-xs text-slate-500">
               Gunakan email dan password yang terdaftar di sistem.
             </p>
-            <p className="text-sm text-slate-500">
-              Belum memiliki akun? <a href="/register" className="text-blue-600 font-bold hover:underline">Daftar di sini</a>
+            <p className="text-xs text-slate-400">
+              Siswa tidak perlu login. Pendaftaran wajah dikelola penuh oleh Administrator.
             </p>
           </div>
         </CardContent>
