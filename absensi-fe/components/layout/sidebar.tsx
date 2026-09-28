@@ -62,7 +62,7 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
       </nav>
       <div className="px-3 py-3 border-t border-border">
         <Link
-          href={//profile}
+          href={`/${user?.role || 'user'}/profile`}
           onClick={onLinkClick}
           className="flex items-center gap-2 px-2 py-1.5 mb-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
