@@ -28,7 +28,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        window.location.replace(//dashboard);
+        window.location.replace(data.role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
       } else {
         setErrorMsg(data.error || "Gagal login");
       }
