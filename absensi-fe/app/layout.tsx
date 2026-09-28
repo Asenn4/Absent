@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={${"$"}{inter.variable} {jetbrainsMono.variable} font-sans min-h-screen antialiased bg-background text-foreground}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans min-h-screen antialiased bg-background text-foreground`}>
         <AuthProvider>
           {children}
         </AuthProvider>
