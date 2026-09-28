@@ -10,8 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -134,9 +132,9 @@ export default function AdminDashboard() {
               recentLogs.map((log) => (
                 <TableRow key={log.id} className="border-border hover:bg-muted/30 transition-colors">
                   <TableCell className="text-xs font-mono text-muted-foreground">
-                    {format(new Date(log.scan_time), 'HH:mm', { locale: id })}
+                    {new Date(log.scan_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                   </TableCell>
-                  <TableCell className="text-xs font-medium text-foreground">{log.user.nama}</TableCell>
+                  <TableCell className="text-xs font-medium text-foreground">{log.user?.nama}</TableCell>
                   <TableCell>
                     <span className={`text-[10px] font-mono font-medium border px-1.5 py-0.5 ${getStatusClass(log.status)}`}>
                       {log.status}
