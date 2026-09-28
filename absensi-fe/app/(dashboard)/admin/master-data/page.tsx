@@ -155,7 +155,7 @@ export default function MasterData() {
         formData.append("photo", editPhotoFile);
       }
 
-      const res = await fetch(/api/users/{editUser.id}, {
+      const res = await fetch(`/api/users/${editUser.id}`, {
         method: "PUT",
         body: formData,
       });
@@ -182,11 +182,11 @@ export default function MasterData() {
   };
 
   const handleDelete = async (userId: string, name: string) => {
-    if (!confirm(Yakin ingin menghapus {name}? Seluruh riwayat presensi & data wajah akan dihapus.)) return;
+    if (!confirm(`Yakin ingin menghapus ${name}? Seluruh riwayat presensi & data wajah akan dihapus.`)) return;
     try {
-      const res = await fetch(/api/users/{userId}, { method: "DELETE" });
+      const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
       if (res.ok) {
-        setSuccessMessage(Pengguna {name} berhasil dihapus.);
+        setSuccessMessage(`Pengguna ${name} berhasil dihapus.`);
         fetchUsers();
         setTimeout(() => setSuccessMessage(""), 4000);
       } else {
@@ -355,7 +355,7 @@ export default function MasterData() {
             ) : (
               users.map((user, index) => {
                 const hasFace = user.face_embed && user.face_embed !== "null" && user.face_embed !== "[]";
-                const photoUrl = user.photo_url ? /api/users/{user.id}/photo : null;
+                const photoUrl = user.photo_url ? `/api/users/${user.id}/photo` : null;
 
                 return (
                   <TableRow key={user.id} className="border-border hover:bg-muted/30 transition-colors">
@@ -374,7 +374,7 @@ export default function MasterData() {
                     </TableCell>
                     <TableCell className="text-xs font-mono text-muted-foreground">{user.email}</TableCell>
                     <TableCell className="text-center">
-                      <span className={	ext-[10px] font-mono font-medium border px-1.5 py-0.5 {user.role === "admin" ? "text-amber-500 border-amber-500/30" : "text-muted-foreground border-border"}}>
+                      <span className={`text-[10px] font-mono font-medium border px-1.5 py-0.5 ${user.role === "admin" ? "text-amber-500 border-amber-500/30" : "text-muted-foreground border-border"}`}>
                         {user.role === "admin" ? "ADMIN" : "SISWA"}
                       </span>
                     </TableCell>

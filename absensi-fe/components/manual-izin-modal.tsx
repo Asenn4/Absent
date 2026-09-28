@@ -35,7 +35,7 @@ export function ManualIzinModal({ isOpen, onClose, onSuccess }: ManualIzinModalP
       const yyyy = localDate.getFullYear();
       const mm = String(localDate.getMonth() + 1).padStart(2, '0');
       const dd = String(localDate.getDate()).padStart(2, '0');
-      setDate(${"$"}{yyyy}-{mm}-{dd});
+      setDate(`${yyyy}-${mm}-${dd}`);
 
       setUserId("");
       setStatus("Izin");

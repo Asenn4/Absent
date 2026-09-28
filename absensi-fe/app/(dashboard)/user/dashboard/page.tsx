@@ -75,7 +75,7 @@ export default function UserDashboard() {
 
     setNotification({
       show: true,
-      message: Wajah terverifikasi! Absen {mode === 'checkIn' ? 'masuk' : 'keluar'} pada {now}.,
+      message: `Wajah terverifikasi! Absen ${mode === 'checkIn' ? 'masuk' : 'keluar'} pada ${now}.`,
       type: 'success'
     });
 
@@ -169,7 +169,7 @@ export default function UserDashboard() {
                 <TableCell className="text-xs font-mono text-muted-foreground">{log.checkIn}</TableCell>
                 <TableCell className="text-xs font-mono text-muted-foreground">{log.checkOut || "-"}</TableCell>
                 <TableCell className="text-right">
-                  <span className={	ext-[10px] font-mono font-medium border px-1.5 py-0.5 {getStatusClass(log.status)}}>
+                  <span className={`text-[10px] font-mono font-medium border px-1.5 py-0.5 ${getStatusClass(log.status)}`}>
                     {log.status}
                   </span>
                 </TableCell>
@@ -187,7 +187,7 @@ export default function UserDashboard() {
 
       {/* Toast Notification */}
       <div
-        className={ixed bottom-4 right-4 z-50 transition-all duration-300 transform {notification.show ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'}}
+        className={`fixed bottom-4 right-4 z-50 transition-all duration-300 transform ${notification.show ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'}`}
       >
         <div className="bg-card border border-primary/30 p-3 flex items-start gap-3 max-w-sm">
           <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />

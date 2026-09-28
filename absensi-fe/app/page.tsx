@@ -198,7 +198,7 @@ export default function KioskPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className={	ext-[10px] font-mono font-medium border px-2 py-1 {getStatusClass(lastNotification.status)}}>
+              <span className={`text-[10px] font-mono font-medium border px-2 py-1 ${getStatusClass(lastNotification.status)}`}>
                 {lastNotification.status}
               </span>
               <span className="text-xs font-mono text-muted-foreground">{lastNotification.time}</span>
@@ -281,7 +281,7 @@ export default function KioskPage() {
                             </div>
                           </div>
                           <div>
-                            <span className={	ext-[10px] font-mono font-medium border px-1.5 py-0.5 {getStatusClass(log.status)}}>
+                            <span className={`text-[10px] font-mono font-medium border px-1.5 py-0.5 ${getStatusClass(log.status)}`}>
                               {log.status}
                             </span>
                           </div>

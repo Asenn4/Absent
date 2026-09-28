@@ -160,8 +160,8 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
           </div>
         </div>
         <div className="flex items-center gap-1.5 border border-border px-2 py-1">
-          <span className={w-1.5 h-1.5 {isSuccess ? "bg-primary" : "bg-muted-foreground"}}></span>
-          <span className={	ext-[10px] font-mono font-bold tracking-widest uppercase {isSuccess ? "text-primary" : "text-muted-foreground"}}>
+          <span className={`w-1.5 h-1.5 ${isSuccess ? "bg-primary" : "bg-muted-foreground"}`}></span>
+          <span className={`text-[10px] font-mono font-bold tracking-widest uppercase ${isSuccess ? "text-primary" : "text-muted-foreground"}`}>
             {isSuccess ? "SUKSES" : "STANDBY"}
           </span>
         </div>
@@ -173,7 +173,7 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
           autoPlay 
           playsInline 
           muted 
-          className={bsolute inset-0 w-full h-full object-cover transition-opacity duration-700 {isSuccess ? "opacity-50" : "opacity-90"}}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isSuccess ? "opacity-50" : "opacity-90"}`}
         />
         <canvas ref={canvasRef} className="hidden" />
 
@@ -194,9 +194,9 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
            {isSuccess ? (
               <CheckCircle2 className="w-6 h-6 text-primary" />
            ) : (
-              <ScanFace className={w-6 h-6 transition-all duration-300 {isScanning ? "text-primary" : "text-muted-foreground"}} />
+              <ScanFace className={`w-6 h-6 transition-all duration-300 ${isScanning ? "text-primary" : "text-muted-foreground"}`} />
            )}
-           <p className={	ext-[10px] font-mono tracking-widest font-bold text-center {isSuccess ? "text-primary" : (isScanning ? "text-primary" : "text-white")}}>
+           <p className={`text-[10px] font-mono tracking-widest font-bold text-center ${isSuccess ? "text-primary" : (isScanning ? "text-primary" : "text-white")}`}>
               {statusMessage}
            </p>
         </div>
@@ -204,7 +204,7 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
         <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end pointer-events-none z-30">
           <div className="flex flex-col gap-0.5 text-[9px] font-mono text-white/90">
             <div className="flex items-center gap-1.5 bg-black/80 px-1.5 py-0.5 border border-white/10">
-              <Activity className={w-2.5 h-2.5 {isSuccess ? "text-primary" : "text-muted-foreground"}} />
+              <Activity className={`w-2.5 h-2.5 ${isSuccess ? "text-primary" : "text-muted-foreground"}`} />
               <span>ENGINE: BUFFALO_L</span>
             </div>
             <div className="flex gap-1">
@@ -224,22 +224,22 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
           <button
             onClick={() => setScanMode("checkIn")}
             disabled={isSuccess || isScanning}
-            className={lex-1 sm:flex-none px-3 py-1.5 text-[10px] font-mono font-bold tracking-widest uppercase border transition-colors {
+            className={`flex-1 sm:flex-none px-3 py-1.5 text-[10px] font-mono font-bold tracking-widest uppercase border transition-colors ${
               scanMode === "checkIn" 
                 ? "bg-primary text-primary-foreground border-primary" 
                 : "bg-background text-muted-foreground border-border hover:bg-muted"
-            }}
+            }`}
           >
             IN
           </button>
           <button
             onClick={() => setScanMode("checkOut")}
             disabled={isSuccess || isScanning}
-            className={lex-1 sm:flex-none px-3 py-1.5 text-[10px] font-mono font-bold tracking-widest uppercase border transition-colors {
+            className={`flex-1 sm:flex-none px-3 py-1.5 text-[10px] font-mono font-bold tracking-widest uppercase border transition-colors ${
               scanMode === "checkOut" 
                 ? "bg-primary text-primary-foreground border-primary" 
                 : "bg-background text-muted-foreground border-border hover:bg-muted"
-            }}
+            }`}
           >
             OUT
           </button>

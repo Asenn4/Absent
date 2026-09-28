@@ -97,7 +97,7 @@ export default function MyHistoryPage() {
                 <TableCell className="text-xs font-mono text-muted-foreground">{log.checkOut}</TableCell>
                 <TableCell className="text-xs font-mono text-muted-foreground">{log.device}</TableCell>
                 <TableCell>
-                  <span className={	ext-[10px] font-mono font-medium border px-1.5 py-0.5 {getStatusClass(log.status)}}>
+                  <span className={`text-[10px] font-mono font-medium border px-1.5 py-0.5 ${getStatusClass(log.status)}`}>
                     {log.status}
                   </span>
                 </TableCell>
