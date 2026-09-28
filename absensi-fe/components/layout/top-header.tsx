@@ -27,7 +27,7 @@ export function TopHeader({ onMenuClick }: TopHeaderProps = {}) {
 
       <div className="flex items-center gap-4">
         <Link
-          href={//profile}
+          href={`/${user?.role || 'user'}/profile`}
           className="hidden md:flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           <span className="font-medium">{user?.name}</span>
