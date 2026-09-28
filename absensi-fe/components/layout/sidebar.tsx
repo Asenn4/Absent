@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 const adminLinks = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Data Master", href: "/admin/master-data", icon: Users },
-  { name: "Verifikasi Wajah", href: "/admin/face-verification", icon: Camera },
   { name: "Log Global", href: "/admin/logs", icon: FileText },
   { name: "Terminal Kiosk", href: "/", icon: ScanFace },
 ];
