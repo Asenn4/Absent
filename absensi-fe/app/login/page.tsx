@@ -46,7 +46,7 @@ export default function LoginPage() {
           <div className="p-6 border-b border-border">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-2 h-2 rounded-full bg-primary" />
-              <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">JETSON_ATTEND</span>
+              <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">CLOCKIN.ID</span>
             </div>
             <h1 className="text-lg font-semibold text-foreground">
               Administrator Login
@@ -68,7 +68,7 @@ export default function LoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@jetson.ai"
+                  placeholder="admin@clockin.id"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -102,7 +102,7 @@ export default function LoginPage() {
                 variant="outline"
                 className="w-1/2 text-[10px] font-mono h-7"
                 onClick={() => {
-                  setEmail("admin@jetson.ai");
+                  setEmail("admin@clockin.id");
                   setPassword("admin");
                 }}
               >
@@ -113,7 +113,7 @@ export default function LoginPage() {
                 variant="outline"
                 className="w-1/2 text-[10px] font-mono h-7"
                 onClick={() => {
-                  setEmail("user@jetson.ai");
+                  setEmail("user@clockin.id");
                   setPassword("user");
                 }}
               >

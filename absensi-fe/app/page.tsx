@@ -158,7 +158,7 @@ export default function KioskPage() {
             <ScanFace className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-sm font-semibold font-mono uppercase tracking-widest">Jetson_Attend <span className="text-primary font-bold">Kiosk</span></h1>
+            <h1 className="text-sm font-semibold font-mono uppercase tracking-widest">ClockIn.id <span className="text-primary font-bold">Kiosk</span></h1>
             <p className="text-[10px] font-mono text-muted-foreground">AI Face Verification Terminal</p>
           </div>
         </div>
@@ -302,7 +302,7 @@ export default function KioskPage() {
       </main>
 
       <footer className="border-t border-border bg-card px-6 py-3 text-center text-[10px] font-mono text-muted-foreground mt-auto">
-        &copy; {new Date().getFullYear()} Jetson_Attend // AI Biometric Terminal
+        &copy; {new Date().getFullYear()} ClockIn.id // AI Biometric Terminal
       </footer>
     </div>
   );

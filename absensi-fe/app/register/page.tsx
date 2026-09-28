@@ -131,7 +131,7 @@ export default function RegisterPage() {
 
         <div className="border-t border-border p-3 text-center bg-muted/20">
           <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest">
-            Sistem didukung oleh Jetson Nano AI
+            Sistem didukung oleh ClockIn.id AI
           </p>
         </div>
       </div>

@@ -34,7 +34,7 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
       <div className="px-4 py-5 border-b border-border flex items-center gap-2.5">
         <div className="w-2 h-2 rounded-full bg-primary" />
         <h1 className="text-sm font-semibold tracking-tight text-foreground font-mono">
-          JETSON<span className="text-primary">_ATTEND</span>
+          CLOCK<span className="text-primary">IN.ID</span>
         </h1>
       </div>
       <nav className="flex-1 py-4 flex flex-col gap-0.5 px-2">

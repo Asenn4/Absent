@@ -80,7 +80,7 @@ export function AttendanceEvidenceModal({ isOpen, onClose, log }: EvidenceModalP
 
         <div className="px-4 py-3 border-t border-border flex justify-between items-center text-[10px] font-mono text-muted-foreground">
           <span>ID: {log.id}</span>
-          <span className="flex items-center gap-1"><Activity className="w-3 h-3 text-primary" /> Jetson AI</span>
+          <span className="flex items-center gap-1"><Activity className="w-3 h-3 text-primary" /> ClockIn.id AI</span>
         </div>
       </DialogContent>
     </Dialog>
