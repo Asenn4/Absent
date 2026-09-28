@@ -1,11 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShieldCheck, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -13,7 +11,6 @@ export default function LoginPage() {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -31,7 +28,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        window.location.replace(`/${data.user.role}/dashboard`);
+        window.location.replace(//dashboard);
       } else {
         setErrorMsg(data.error || "Gagal login");
       }
@@ -43,102 +40,100 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <Card className="w-full max-w-md bg-white border-none shadow-xl">
-        <CardHeader className="space-y-3 text-center pb-6">
-          <div className="flex justify-center mb-2">
-            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
-              <ShieldCheck className="w-10 h-10 text-blue-600" />
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-sm">
+        <div className="border border-border bg-card">
+          <div className="p-6 border-b border-border">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">JETSON_ATTEND</span>
             </div>
-          </div>
-          <CardTitle className="text-2xl font-bold text-slate-800 tracking-tight">
-            Portal Administrator
-          </CardTitle>
-          <CardDescription className="text-slate-500">
-            Masuk untuk mengelola master data siswa & presensi AI
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleManualLogin} className="space-y-4">
-            {errorMsg && (
-              <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md border border-red-200">
-                {errorMsg}
-              </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m.example@jetson.ai"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-slate-50 border-slate-200 focus-visible:ring-blue-600"
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-slate-50 border-slate-200 focus-visible:ring-blue-600"
-              />
-            </div>
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-11">
-              Masuk
-            </Button>
-          </form>
-
-          {/* Quick Login Buttons for Development */}
-          <div className="mt-4 flex gap-2">
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="w-1/2 text-xs"
-              onClick={() => {
-                setEmail("admin@jetson.ai");
-                setPassword("admin");
-              }}
-            >
-              Fill Admin
-            </Button>
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="w-1/2 text-xs"
-              onClick={() => {
-                setEmail("user@jetson.ai");
-                setPassword("user");
-              }}
-            >
-              Fill User
-            </Button>
-          </div>
-
-          <div className="mt-8 text-center space-y-2">
-            <p className="text-xs text-slate-500">
-              Gunakan email dan password yang terdaftar di sistem.
-            </p>
-            <p className="text-xs text-slate-400">
-              Siswa tidak perlu login. Pendaftaran wajah dikelola penuh oleh Administrator.
+            <h1 className="text-lg font-semibold text-foreground">
+              Administrator Login
+            </h1>
+            <p className="text-xs text-muted-foreground mt-1">
+              Masuk untuk mengelola master data siswa & presensi AI
             </p>
           </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-2 items-center border-t border-slate-100 pt-4 pb-6">
-          <Link href="/" className="text-xs text-blue-600 hover:text-blue-700 font-medium hover:underline flex items-center gap-1">
-            ← Kembali ke Terminal Absensi (Kiosk)
-          </Link>
-          <p className="text-[11px] text-slate-400">
-            Sistem didukung oleh Jetson Nano AI
-          </p>
-        </CardFooter>
-      </Card>
+
+          <div className="p-6">
+            <form onSubmit={handleManualLogin} className="space-y-4">
+              {errorMsg && (
+                <div className="bg-destructive/10 text-destructive text-xs p-3 border border-destructive/20 font-mono">
+                  {errorMsg}
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-xs font-mono text-muted-foreground uppercase tracking-widest">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@jetson.ai"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-background border-border text-foreground font-mono text-sm h-9"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-xs font-mono text-muted-foreground uppercase tracking-widest">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="bg-background border-border text-foreground font-mono text-sm h-9"
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-xs uppercase tracking-widest h-9"
+              >
+                {loading ? "Memproses..." : "Masuk"}
+              </Button>
+            </form>
+
+            {/* Quick Login Buttons for Development */}
+            <div className="mt-3 flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-1/2 text-[10px] font-mono h-7"
+                onClick={() => {
+                  setEmail("admin@jetson.ai");
+                  setPassword("admin");
+                }}
+              >
+                Fill Admin
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-1/2 text-[10px] font-mono h-7"
+                onClick={() => {
+                  setEmail("user@jetson.ai");
+                  setPassword("user");
+                }}
+              >
+                Fill User
+              </Button>
+            </div>
+          </div>
+
+          <div className="px-6 py-4 border-t border-border">
+            <p className="text-[10px] text-muted-foreground font-mono text-center">
+              Siswa tidak perlu login. Pendaftaran wajah dikelola oleh Administrator.
+            </p>
+            <div className="mt-2 text-center">
+              <Link href="/" className="text-[10px] text-primary hover:underline font-mono">
+                &larr; Terminal Absensi (Kiosk)
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

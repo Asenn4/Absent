@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -29,15 +29,14 @@ export function ManualIzinModal({ isOpen, onClose, onSuccess }: ManualIzinModalP
             setUsers(res.data);
           }
         });
-      
-      // Default date to today
+
       const today = new Date();
       const localDate = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
       const yyyy = localDate.getFullYear();
       const mm = String(localDate.getMonth() + 1).padStart(2, '0');
       const dd = String(localDate.getDate()).padStart(2, '0');
-      setDate(`${yyyy}-${mm}-${dd}`);
-      
+      setDate(${"$"}{yyyy}-{mm}-{dd});
+
       setUserId("");
       setStatus("Izin");
       setError("");
@@ -78,19 +77,19 @@ export function ManualIzinModal({ isOpen, onClose, onSuccess }: ManualIzinModalP
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md bg-white border-blue-100 rounded-2xl shadow-xl">
-        <DialogHeader className="p-6 pb-2 border-b border-blue-100">
-          <DialogTitle className="text-xl font-bold text-blue-900">Input Manual / Izin</DialogTitle>
+      <DialogContent className="sm:max-w-sm bg-card border border-border p-5">
+        <DialogHeader className="pb-3 border-b border-border">
+          <DialogTitle className="text-sm font-semibold text-foreground">Input Manual / Izin</DialogTitle>
         </DialogHeader>
-        
-        <div className="p-6 space-y-4">
-          {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
-          
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-blue-900">Nama Karyawan</label>
+
+        <div className="space-y-3 pt-2">
+          {error && <div className="text-destructive text-xs font-mono p-2 bg-destructive/10 border border-destructive/20">{error}</div>}
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Karyawan</label>
             <Select value={userId} onValueChange={(val) => setUserId(val || "")}>
-              <SelectTrigger className="w-full border-blue-200">
-                <SelectValue placeholder="Pilih Karyawan" />
+              <SelectTrigger className="w-full border-border bg-background text-xs font-mono h-8">
+                <SelectValue placeholder="Pilih..." />
               </SelectTrigger>
               <SelectContent>
                 {users.map(user => (
@@ -100,21 +99,21 @@ export function ManualIzinModal({ isOpen, onClose, onSuccess }: ManualIzinModalP
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-blue-900">Tanggal</label>
-            <Input 
-              type="date" 
-              value={date} 
-              onChange={(e) => setDate(e.target.value)} 
-              className="border-blue-200"
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Tanggal</label>
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="h-8 text-xs font-mono bg-background border-border"
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-blue-900">Status</label>
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Status</label>
             <Select value={status} onValueChange={(val) => setStatus(val || "")}>
-              <SelectTrigger className="w-full border-blue-200">
-                <SelectValue placeholder="Pilih Status" />
+              <SelectTrigger className="w-full border-border bg-background text-xs font-mono h-8">
+                <SelectValue placeholder="Pilih..." />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Izin">Izin</SelectItem>
@@ -124,12 +123,12 @@ export function ManualIzinModal({ isOpen, onClose, onSuccess }: ManualIzinModalP
           </div>
         </div>
 
-        <DialogFooter className="p-6 pt-2">
-          <Button variant="outline" onClick={onClose} className="border-blue-200 text-blue-700">Batal</Button>
-          <Button onClick={handleSubmit} disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white">
+        <div className="flex justify-end gap-2 pt-3 border-t border-border">
+          <Button variant="ghost" onClick={onClose} className="text-xs font-mono">Batal</Button>
+          <Button onClick={handleSubmit} disabled={loading} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono h-8 px-4">
             {loading ? "Menyimpan..." : "Simpan"}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

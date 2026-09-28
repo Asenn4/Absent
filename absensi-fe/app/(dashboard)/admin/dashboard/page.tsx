@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, UserCheck, Clock, UserX } from "lucide-react";
@@ -36,95 +36,61 @@ export default function AdminDashboard() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  const stats = [
+    { label: "TOTAL USERS", value: data.totalUsers, icon: Users, sub: "Registered" },
+    { label: "PRESENT", value: data.present, icon: UserCheck, sub: "Today" },
+    { label: "LATE", value: data.late, icon: Clock, sub: "Today", accent: true },
+    { label: "ABSENT", value: data.absent, icon: UserX, sub: "Unexcused", danger: true },
+  ];
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-extrabold text-blue-900">Admin Dashboard</h1>
-        <p className="text-blue-600/80 mt-1 font-medium">System overview and statistics.</p>
+        <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
+        <p className="text-xs text-muted-foreground font-mono mt-0.5">system overview</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-white border border-blue-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group overflow-hidden relative rounded-2xl">
-          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-colors"></div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
-            <CardTitle className="text-sm font-bold text-blue-800">Total Users</CardTitle>
-            <div className="p-2.5 bg-blue-50 rounded-xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-sm border border-blue-100">
-              <Users className="w-5 h-5 text-blue-600" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <div key={stat.label} className="border border-border bg-card p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono font-medium text-muted-foreground uppercase tracking-widest">{stat.label}</span>
+                <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+              </div>
+              <div className={	ext-2xl font-mono font-bold tracking-tight {stat.danger ? 'text-destructive' : stat.accent ? 'text-amber-500' : 'text-foreground'}}>
+                {stat.value}
+              </div>
+              <p className="text-[10px] font-mono text-muted-foreground mt-1">{stat.sub}</p>
             </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className="text-4xl font-extrabold text-blue-900 tracking-tight">{data.totalUsers}</div>
-            <p className="text-xs font-medium text-blue-500 mt-2">Registered in system</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-blue-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group overflow-hidden relative rounded-2xl">
-          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-yellow-400/10 rounded-full blur-2xl group-hover:bg-yellow-400/20 transition-colors"></div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
-            <CardTitle className="text-sm font-bold text-blue-800">Present</CardTitle>
-            <div className="p-2.5 bg-blue-50 rounded-xl group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 shadow-sm border border-blue-100">
-              <UserCheck className="w-5 h-5 text-blue-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className="text-4xl font-extrabold text-blue-900 tracking-tight">{data.present}</div>
-            <p className="text-xs font-medium text-blue-500 mt-2">Today</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-blue-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group overflow-hidden relative rounded-2xl">
-          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-yellow-400/10 rounded-full blur-2xl group-hover:bg-yellow-400/20 transition-colors"></div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
-            <CardTitle className="text-sm font-bold text-blue-800">Late</CardTitle>
-            <div className="p-2.5 bg-blue-50 rounded-xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-sm border border-blue-100">
-              <Clock className="w-5 h-5 text-blue-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className="text-4xl font-extrabold text-blue-900 tracking-tight">{data.late}</div>
-            <p className="text-xs font-medium text-yellow-500 mt-2 animate-pulse">Action required</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-blue-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group overflow-hidden relative rounded-2xl">
-          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-red-500/10 rounded-full blur-2xl group-hover:bg-red-500/20 transition-colors"></div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 relative z-10">
-            <CardTitle className="text-sm font-bold text-blue-800">Absent</CardTitle>
-            <div className="p-2.5 bg-blue-50 rounded-xl group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 shadow-sm border border-blue-100">
-              <UserX className="w-5 h-5 text-blue-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className="text-4xl font-extrabold text-blue-900 tracking-tight">{data.absent}</div>
-            <p className="text-xs font-medium text-blue-500 mt-2">Unexcused</p>
-          </CardContent>
-        </Card>
+          );
+        })}
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
-        <div className="w-full">
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.2)] p-2">
-            <CardHeader>
-              <CardTitle className="text-lg text-slate-800 dark:text-slate-100">Weekly Attendance Trend</CardTitle>
-            </CardHeader>
-            <CardContent className="h-[350px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data.trendData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dx={-10} />
-                  <Tooltip
-                    cursor={{ stroke: '#cbd5e1', strokeWidth: 2, strokeDasharray: '5 5' }}
-                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  />
-                  <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                  <Line type="monotone" dataKey="present" name="Present" stroke="#2563eb" strokeWidth={3} dot={{ r: 4, fill: '#2563eb', strokeWidth: 0 }} activeDot={{ r: 6, strokeWidth: 0 }} />
-                  <Line type="monotone" dataKey="late" name="Late" stroke="#facc15" strokeWidth={3} dot={{ r: 4, fill: '#facc15', strokeWidth: 0 }} activeDot={{ r: 6, strokeWidth: 0 }} />
-                  <Line type="monotone" dataKey="absent" name="Absent" stroke="#94a3b8" strokeWidth={3} dot={{ r: 4, fill: '#94a3b8', strokeWidth: 0 }} activeDot={{ r: 6, strokeWidth: 0 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+      <div className="border border-border bg-card p-4">
+        <div className="mb-4">
+          <h2 className="text-sm font-semibold text-foreground">Weekly Trend</h2>
+          <p className="text-[10px] font-mono text-muted-foreground mt-0.5">attendance over time</p>
+        </div>
+        <div className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data.trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272a" />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 11, fontFamily: 'monospace' }} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#a1a1aa', fontSize: 11, fontFamily: 'monospace' }} dx={-10} />
+              <Tooltip
+                cursor={{ stroke: '#3f3f46', strokeWidth: 1 }}
+                contentStyle={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '2px', fontSize: '12px', fontFamily: 'monospace' }}
+                labelStyle={{ color: '#a1a1aa' }}
+              />
+              <Legend wrapperStyle={{ paddingTop: '16px', fontSize: '11px', fontFamily: 'monospace' }} />
+              <Line type="monotone" dataKey="present" name="Present" stroke="#22c55e" strokeWidth={2} dot={{ r: 2, fill: '#22c55e', strokeWidth: 0 }} activeDot={{ r: 4, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="late" name="Late" stroke="#f59e0b" strokeWidth={2} dot={{ r: 2, fill: '#f59e0b', strokeWidth: 0 }} activeDot={{ r: 4, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="absent" name="Absent" stroke="#71717a" strokeWidth={2} dot={{ r: 2, fill: '#71717a', strokeWidth: 0 }} activeDot={{ r: 4, strokeWidth: 0 }} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

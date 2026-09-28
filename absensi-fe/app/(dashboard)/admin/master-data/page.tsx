@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Plus, 
   Pencil, 
@@ -29,12 +28,10 @@ import {
   Camera, 
   CheckCircle2, 
   AlertCircle, 
-  Sparkles,
   Users,
   RefreshCw,
   X
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function MasterData() {
   const [users, setUsers] = useState<any[]>([]);
@@ -80,7 +77,6 @@ export default function MasterData() {
     fetchUsers();
   }, []);
 
-  // Handle pilih file foto tambah user
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -94,7 +90,6 @@ export default function MasterData() {
     }
   };
 
-  // Reset form tambah user
   const resetAddForm = () => {
     setNewName("");
     setNewEmail("");
@@ -106,7 +101,6 @@ export default function MasterData() {
     if (addFileInputRef.current) addFileInputRef.current.value = "";
   };
 
-  // Simpan Pengguna Baru
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -146,7 +140,6 @@ export default function MasterData() {
     }
   };
 
-  // Simpan Edit Pengguna
   const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editUser) return;
@@ -162,7 +155,7 @@ export default function MasterData() {
         formData.append("photo", editPhotoFile);
       }
 
-      const res = await fetch(`/api/users/${editUser.id}`, {
+      const res = await fetch(/api/users/{editUser.id}, {
         method: "PUT",
         body: formData,
       });
@@ -188,96 +181,66 @@ export default function MasterData() {
     }
   };
 
-  // Hapus Pengguna
   const handleDelete = async (userId: string, name: string) => {
-    if (!confirm(`Yakin ingin menghapus ${name}? Seluruh riwayat presensi & data wajah akan dihapus.`)) return;
+    if (!confirm(Yakin ingin menghapus {name}? Seluruh riwayat presensi & data wajah akan dihapus.)) return;
     try {
-      const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
+      const res = await fetch(/api/users/{userId}, { method: "DELETE" });
       if (res.ok) {
-        setSuccessMessage(`Pengguna ${name} berhasil dihapus.`);
+        setSuccessMessage(Pengguna {name} berhasil dihapus.);
         fetchUsers();
         setTimeout(() => setSuccessMessage(""), 4000);
       } else {
-        alert("Gagal menghapus user.");
+        const data = await res.json();
+        alert(data.error || "Gagal menghapus pengguna.");
       }
     } catch (err) {
       console.error(err);
+      alert("Terjadi kesalahan saat menghapus.");
     }
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-extrabold text-blue-900 tracking-tight">Master Data Pengguna</h1>
-          <p className="text-blue-700/70 mt-1 font-medium text-sm">
-            Daftarkan siswa/pengguna beserta foto wajah untuk sistem presensi AI Kiosk.
-          </p>
+          <h1 className="text-lg font-semibold text-foreground">Data Master</h1>
+          <p className="text-xs text-muted-foreground font-mono mt-0.5">kelola pengguna & data biometrik</p>
         </div>
-        
-        {/* Dialog Tambah Pengguna Baru */}
         <Dialog open={isAddOpen} onOpenChange={(open) => {
           setIsAddOpen(open);
           if (!open) resetAddForm();
         }}>
-          <DialogTrigger
-            render={
-              <Button className="bg-yellow-400 hover:bg-yellow-500 text-blue-950 font-extrabold gap-2 px-5 py-2.5 rounded-xl shadow-md shadow-yellow-400/20 active:scale-95 transition-all">
-                <Plus className="w-5 h-5" /> Tambah Siswa & Foto Wajah
-              </Button>
-            }
-          />
-          <DialogContent className="sm:max-w-[550px] rounded-2xl bg-white border border-blue-100 p-6 shadow-2xl">
-            <DialogHeader className="pb-2 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-blue-100 text-blue-700 rounded-xl">
-                  <Users className="w-5 h-5" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-bold text-blue-950">Daftarkan Siswa Baru</DialogTitle>
-                  <p className="text-xs text-slate-500 mt-0.5">Input data dan unggah foto wajah siswa untuk model AI</p>
-                </div>
-              </div>
+          <DialogTrigger render={
+            <Button variant="outline" className="gap-1.5 text-xs font-mono h-8">
+              <Plus className="w-3.5 h-3.5" /> Tambah User
+            </Button>
+          } />
+          <DialogContent className="sm:max-w-[480px] bg-card border border-border p-5">
+            <DialogHeader className="pb-3 border-b border-border">
+              <DialogTitle className="text-sm font-semibold text-foreground">Tambah Pengguna Baru</DialogTitle>
+              <p className="text-[10px] font-mono text-muted-foreground mt-0.5">Daftarkan siswa/admin baru ke sistem</p>
             </DialogHeader>
 
-            <form onSubmit={handleAdd} className="space-y-4 pt-3">
+            <form onSubmit={handleAdd} className="space-y-3 pt-3">
               {errorMessage && (
-                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <div className="p-2 bg-destructive/10 border border-destructive/20 text-destructive text-xs font-mono flex items-center gap-2">
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>{errorMessage}</span>
                 </div>
               )}
 
-              {/* Upload Foto Wajah */}
-              <div className="space-y-2">
-                <Label className="text-xs font-bold text-slate-700">Foto Wajah Siswa (AI Model)</Label>
-                <div className="flex items-center gap-4">
-                  <div className="relative w-24 h-24 rounded-2xl bg-slate-100 border-2 border-dashed border-blue-200 flex items-center justify-center overflow-hidden group">
+              {/* Upload Foto */}
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Foto Wajah</Label>
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 bg-muted border border-border flex items-center justify-center overflow-hidden">
                     {newPhotoPreview ? (
-                      <>
-                        <img src={newPhotoPreview} alt="Preview" className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setNewPhotoFile(null);
-                            setNewPhotoPreview(null);
-                            if (addFileInputRef.current) addFileInputRef.current.value = "";
-                          }}
-                          className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </>
+                      <img src={newPhotoPreview} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="flex flex-col items-center justify-center text-slate-400">
-                        <Camera className="w-6 h-6 mb-1 text-blue-400" />
-                        <span className="text-[10px] font-medium">Unggah</span>
-                      </div>
+                      <Camera className="w-5 h-5 text-muted-foreground" />
                     )}
                   </div>
-
-                  <div className="flex-1 space-y-1.5">
+                  <div className="flex-1 space-y-1">
                     <input
                       ref={addFileInputRef}
                       type="file"
@@ -291,97 +254,51 @@ export default function MasterData() {
                       variant="outline"
                       size="sm"
                       onClick={() => addFileInputRef.current?.click()}
-                      className="text-xs font-bold text-blue-700 border-blue-200 hover:bg-blue-50 flex items-center gap-1.5"
+                      className="text-[10px] font-mono h-7 gap-1"
                     >
-                      <Upload className="w-3.5 h-3.5" /> Pilih File Foto
+                      <Upload className="w-3 h-3" /> Upload
                     </Button>
-                    <p className="text-[11px] text-slate-500 leading-tight">
-                      Gunakan foto portrait wajah yang jelas, menghadap kamera, dan berpenerangan baik.
-                    </p>
+                    <p className="text-[10px] font-mono text-muted-foreground">Opsional. Vektor AI diekstrak otomatis.</p>
                   </div>
                 </div>
               </div>
 
-              {/* Input Data Siswa */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="add-name" className="text-xs font-bold text-slate-700">Nama Lengkap *</Label>
-                  <Input 
-                    id="add-name" 
-                    required 
-                    value={newName} 
-                    onChange={e => setNewName(e.target.value)} 
-                    placeholder="Contoh: Budi Santoso"
-                    className="h-10 text-xs rounded-xl border-slate-200 focus-visible:ring-blue-600"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="add-email" className="text-xs font-bold text-slate-700">Email / NIS *</Label>
-                  <Input 
-                    id="add-email" 
-                    type="email" 
-                    required 
-                    value={newEmail} 
-                    onChange={e => setNewEmail(e.target.value)} 
-                    placeholder="budi@sekolah.sch.id" 
-                    className="h-10 text-xs rounded-xl border-slate-200 focus-visible:ring-blue-600"
-                  />
-                </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Nama</Label>
+                <Input value={newName} onChange={e => setNewName(e.target.value)} required className="h-8 text-xs font-mono bg-background border-border" />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="add-role" className="text-xs font-bold text-slate-700">Role</Label>
-                  <select
-                    id="add-role"
-                    value={newRole}
-                    onChange={e => setNewRole(e.target.value)}
-                    className="w-full h-10 px-3 text-xs bg-white rounded-xl border border-slate-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  >
-                    <option value="user">Siswa / Pengguna Biasa</option>
-                    <option value="admin">Administrator</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="add-password" className="text-xs font-bold text-slate-700">Password (Opsional)</Label>
-                  <Input 
-                    id="add-password" 
-                    type="password" 
-                    value={newPassword} 
-                    onChange={e => setNewPassword(e.target.value)} 
-                    placeholder="Default: 123456" 
-                    className="h-10 text-xs rounded-xl border-slate-200 focus-visible:ring-blue-600"
-                  />
-                </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Email / NIS</Label>
+                <Input type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} required className="h-8 text-xs font-mono bg-background border-border" />
               </div>
 
-              <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-xl flex items-center gap-2 text-xs text-blue-900">
-                <Sparkles className="w-4 h-4 text-yellow-500 flex-shrink-0" />
-                <span>AI akan otomatis mengekstrak 512 fitur biometrik wajah begitu disimpan.</span>
+              <div className="space-y-1">
+                <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Password</Label>
+                <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Default: 123456" className="h-8 text-xs font-mono bg-background border-border" />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  onClick={() => setIsAddOpen(false)} 
-                  disabled={isSubmitting}
-                  className="text-xs font-medium text-slate-600"
+              <div className="space-y-1">
+                <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Role</Label>
+                <select
+                  value={newRole}
+                  onChange={e => setNewRole(e.target.value)}
+                  className="w-full h-8 px-2 text-xs font-mono bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 >
+                  <option value="user">Siswa</option>
+                  <option value="admin">Administrator</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                <Button type="button" variant="ghost" onClick={() => setIsAddOpen(false)} disabled={isSubmitting} className="text-xs font-mono">
                   Batal
                 </Button>
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 h-10 rounded-xl shadow-md shadow-blue-500/20 flex items-center gap-2"
-                >
+                <Button type="submit" disabled={isSubmitting} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono h-8 px-4 gap-1.5">
                   {isSubmitting ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Memproses AI...</span>
-                    </>
+                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /><span>Menyimpan...</span></>
                   ) : (
-                    <span>Simpan & Daftarkan Wajah</span>
+                    <span>Simpan</span>
                   )}
                 </Button>
               </div>
@@ -390,86 +307,88 @@ export default function MasterData() {
         </Dialog>
       </div>
 
-      {/* Alert Sukses */}
+      {/* Success Toast */}
       {successMessage && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center gap-2 text-xs font-bold shadow-sm animate-in fade-in">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-          <span>{successMessage}</span>
+        <div className="bg-primary/10 border border-primary/20 text-primary text-xs font-mono p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>{successMessage}</span>
+          </div>
+          <button onClick={() => setSuccessMessage("")} className="text-muted-foreground hover:text-foreground">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
-      {/* Tabel Master Data */}
-      <Card className="bg-white border border-blue-100 shadow-sm rounded-2xl overflow-hidden">
+      {/* Table */}
+      <div className="border border-border bg-card">
+        <div className="border-b border-border p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Users className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-mono text-muted-foreground">{users.length} pengguna terdaftar</span>
+          </div>
+        </div>
         <Table>
-          <TableHeader className="bg-slate-50/70 border-b border-blue-50">
-            <TableRow>
-              <TableHead className="font-bold text-blue-950 text-xs">Profil & Wajah</TableHead>
-              <TableHead className="font-bold text-blue-950 text-xs">Nama Lengkap</TableHead>
-              <TableHead className="font-bold text-blue-950 text-xs">Email / NIS</TableHead>
-              <TableHead className="font-bold text-blue-950 text-xs">Role</TableHead>
-              <TableHead className="font-bold text-blue-950 text-xs text-center">Status Model AI</TableHead>
-              <TableHead className="font-bold text-blue-950 text-xs text-right pr-6">Aksi</TableHead>
+          <TableHeader>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest w-12">#</TableHead>
+              <TableHead className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Nama</TableHead>
+              <TableHead className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Email</TableHead>
+              <TableHead className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest text-center">Role</TableHead>
+              <TableHead className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest text-center">Face AI</TableHead>
+              <TableHead className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-slate-400 text-xs font-medium">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <RefreshCw className="w-5 h-5 animate-spin text-blue-600" />
-                    <span>Memuat data pengguna...</span>
-                  </div>
+                <TableCell colSpan={6} className="text-center py-8 text-xs font-mono text-muted-foreground">
+                  Memuat data...
                 </TableCell>
               </TableRow>
             ) : users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-slate-400 text-xs">
-                  Belum ada pengguna terdaftar. Klik tombol Tambah di atas untuk mendaftarkan siswa.
+                <TableCell colSpan={6} className="text-center py-8 text-xs font-mono text-muted-foreground">
+                  Belum ada data pengguna.
                 </TableCell>
               </TableRow>
             ) : (
-              users.map((user) => {
-                const photoUrl = user.face_reqs?.[0]?.photo_url;
-                const hasFace = !!user.face_embed;
+              users.map((user, index) => {
+                const hasFace = user.face_embed && user.face_embed !== "null" && user.face_embed !== "[]";
+                const photoUrl = user.photo_url ? /api/users/{user.id}/photo : null;
 
                 return (
-                  <TableRow key={user.id} className="hover:bg-blue-50/30 transition-colors">
-                    <TableCell className="py-3">
-                      <Avatar className="h-10 w-10 border border-blue-100 shadow-sm">
-                        {photoUrl && <AvatarImage src={photoUrl} alt={user.nama} className="object-cover" />}
-                        <AvatarFallback className="bg-gradient-to-br from-blue-700 to-blue-900 text-white font-bold text-xs">
-                          {user.nama ? user.nama.substring(0, 2).toUpperCase() : "US"}
-                        </AvatarFallback>
-                      </Avatar>
-                    </TableCell>
-                    <TableCell className="font-bold text-slate-800 text-xs">{user.nama}</TableCell>
-                    <TableCell className="text-slate-600 text-xs">{user.email}</TableCell>
+                  <TableRow key={user.id} className="border-border hover:bg-muted/30 transition-colors">
+                    <TableCell className="text-[10px] font-mono text-muted-foreground">{index + 1}</TableCell>
                     <TableCell>
-                      <Badge 
-                        variant="outline" 
-                        className={user.role === "admin" 
-                          ? "bg-blue-50 text-blue-700 border-blue-200 font-bold text-[10px]" 
-                          : "bg-slate-50 text-slate-700 border-slate-200 font-medium text-[10px]"
-                        }
-                      >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 bg-muted border border-border flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {photoUrl ? (
+                            <img src={photoUrl} alt={user.nama} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-[9px] font-mono font-bold text-muted-foreground">{user.nama?.substring(0, 2).toUpperCase()}</span>
+                          )}
+                        </div>
+                        <span className="text-xs font-medium text-foreground">{user.nama}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-xs font-mono text-muted-foreground">{user.email}</TableCell>
+                    <TableCell className="text-center">
+                      <span className={	ext-[10px] font-mono font-medium border px-1.5 py-0.5 {user.role === "admin" ? "text-amber-500 border-amber-500/30" : "text-muted-foreground border-border"}}>
                         {user.role === "admin" ? "ADMIN" : "SISWA"}
-                      </Badge>
+                      </span>
                     </TableCell>
                     <TableCell className="text-center">
                       {hasFace ? (
-                        <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[10px] gap-1 px-2.5 py-0.5">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600" /> AI Terdaftar
-                        </Badge>
+                        <span className="text-[10px] font-mono text-primary border border-primary/30 px-1.5 py-0.5 inline-flex items-center gap-1">
+                          <CheckCircle2 className="w-2.5 h-2.5" /> OK
+                        </span>
                       ) : (
-                        <Badge variant="outline" className="bg-slate-50 text-slate-400 border-slate-200 text-[10px]">
-                          Belum Ada Foto
-                        </Badge>
+                        <span className="text-[10px] font-mono text-muted-foreground">—</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-right space-x-2 pr-6">
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
+                    <TableCell className="text-right space-x-1">
+                      <button
                         onClick={() => {
                           setEditUser({ ...user });
                           setEditPhotoFile(null);
@@ -477,18 +396,17 @@ export default function MasterData() {
                           setErrorMessage("");
                           setIsEditOpen(true);
                         }}
-                        className="text-xs font-bold text-blue-700 border-blue-200 hover:bg-blue-50 h-8 rounded-lg"
+                        className="text-[10px] font-mono text-primary hover:underline"
                       >
-                        <Pencil className="w-3.5 h-3.5 mr-1" /> Edit / Foto
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
+                        edit
+                      </button>
+                      <span className="text-muted-foreground">|</span>
+                      <button
                         onClick={() => handleDelete(user.id, user.nama)}
-                        className="text-xs font-bold text-red-600 border-red-200 hover:bg-red-50 h-8 rounded-lg"
+                        className="text-[10px] font-mono text-destructive hover:underline"
                       >
-                        <Trash2 className="w-3.5 h-3.5 mr-1" /> Hapus
-                      </Button>
+                        hapus
+                      </button>
                     </TableCell>
                   </TableRow>
                 );
@@ -496,7 +414,7 @@ export default function MasterData() {
             )}
           </TableBody>
         </Table>
-      </Card>
+      </div>
 
       {/* Dialog Edit Pengguna & Update Foto */}
       <Dialog open={isEditOpen} onOpenChange={(open) => {
@@ -508,44 +426,33 @@ export default function MasterData() {
           setErrorMessage("");
         }
       }}>
-        <DialogContent className="sm:max-w-[550px] rounded-2xl bg-white border border-blue-100 p-6 shadow-2xl">
-          <DialogHeader className="pb-2 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-blue-100 text-blue-700 rounded-xl">
-                <Pencil className="w-5 h-5" />
-              </div>
-              <div>
-                <DialogTitle className="text-xl font-bold text-blue-950">Edit Data & Foto Wajah</DialogTitle>
-                <p className="text-xs text-slate-500 mt-0.5">Perbarui informasi siswa atau unggah foto wajah baru</p>
-              </div>
-            </div>
+        <DialogContent className="sm:max-w-[480px] bg-card border border-border p-5">
+          <DialogHeader className="pb-3 border-b border-border">
+            <DialogTitle className="text-sm font-semibold text-foreground">Edit Data & Foto</DialogTitle>
+            <p className="text-[10px] font-mono text-muted-foreground mt-0.5">Perbarui informasi atau unggah foto wajah baru</p>
           </DialogHeader>
 
           {editUser && (
-            <form onSubmit={handleEdit} className="space-y-4 pt-3">
+            <form onSubmit={handleEdit} className="space-y-3 pt-3">
               {errorMessage && (
-                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <div className="p-2 bg-destructive/10 border border-destructive/20 text-destructive text-xs font-mono flex items-center gap-2">
+                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>{errorMessage}</span>
                 </div>
               )}
 
-              {/* Upload Foto Baru */}
-              <div className="space-y-2">
-                <Label className="text-xs font-bold text-slate-700">Foto Wajah Siswa</Label>
-                <div className="flex items-center gap-4">
-                  <div className="relative w-24 h-24 rounded-2xl bg-slate-100 border-2 border-dashed border-blue-200 flex items-center justify-center overflow-hidden">
+              {/* Upload Foto */}
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Foto Wajah</Label>
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 bg-muted border border-border flex items-center justify-center overflow-hidden">
                     {editPhotoPreview ? (
                       <img src={editPhotoPreview} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="flex flex-col items-center justify-center text-slate-400">
-                        <Camera className="w-6 h-6 mb-1 text-blue-400" />
-                        <span className="text-[10px] font-medium">Kosong</span>
-                      </div>
+                      <Camera className="w-5 h-5 text-muted-foreground" />
                     )}
                   </div>
-
-                  <div className="flex-1 space-y-1.5">
+                  <div className="flex-1 space-y-1">
                     <input
                       ref={editFileInputRef}
                       type="file"
@@ -559,72 +466,57 @@ export default function MasterData() {
                       variant="outline"
                       size="sm"
                       onClick={() => editFileInputRef.current?.click()}
-                      className="text-xs font-bold text-blue-700 border-blue-200 hover:bg-blue-50 flex items-center gap-1.5"
+                      className="text-[10px] font-mono h-7 gap-1"
                     >
-                      <Upload className="w-3.5 h-3.5" /> Unggah / Ganti Foto
+                      <Upload className="w-3 h-3" /> Upload / Ganti
                     </Button>
-                    <p className="text-[11px] text-slate-500 leading-tight">
-                      Pilih foto wajah baru untuk mengekstrak ulang vektor biometrik.
-                    </p>
+                    <p className="text-[10px] font-mono text-muted-foreground">Vektor biometrik diekstrak ulang otomatis.</p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">Nama Lengkap</Label>
-                <Input 
-                  value={editUser.nama} 
-                  onChange={e => setEditUser({ ...editUser, nama: e.target.value })} 
-                  required 
-                  className="h-10 text-xs rounded-xl border-slate-200"
+              <div className="space-y-1">
+                <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Nama</Label>
+                <Input
+                  value={editUser.nama}
+                  onChange={e => setEditUser({ ...editUser, nama: e.target.value })}
+                  required
+                  className="h-8 text-xs font-mono bg-background border-border"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">Email / NIS</Label>
-                <Input 
-                  type="email" 
-                  value={editUser.email} 
-                  onChange={e => setEditUser({ ...editUser, email: e.target.value })} 
-                  required 
-                  className="h-10 text-xs rounded-xl border-slate-200"
+              <div className="space-y-1">
+                <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Email / NIS</Label>
+                <Input
+                  type="email"
+                  value={editUser.email}
+                  onChange={e => setEditUser({ ...editUser, email: e.target.value })}
+                  required
+                  className="h-8 text-xs font-mono bg-background border-border"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold text-slate-700">Role</Label>
+              <div className="space-y-1">
+                <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Role</Label>
                 <select
                   value={editUser.role}
                   onChange={e => setEditUser({ ...editUser, role: e.target.value })}
-                  className="w-full h-10 px-3 text-xs bg-white rounded-xl border border-slate-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full h-8 px-2 text-xs font-mono bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 >
-                  <option value="user">Siswa / Pengguna Biasa</option>
+                  <option value="user">Siswa</option>
                   <option value="admin">Administrator</option>
                 </select>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  onClick={() => setIsEditOpen(false)} 
-                  disabled={isSubmitting}
-                  className="text-xs font-medium text-slate-600"
-                >
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                <Button type="button" variant="ghost" onClick={() => setIsEditOpen(false)} disabled={isSubmitting} className="text-xs font-mono">
                   Batal
                 </Button>
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 h-10 rounded-xl shadow-md shadow-blue-500/20 flex items-center gap-2"
-                >
+                <Button type="submit" disabled={isSubmitting} className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-mono h-8 px-4 gap-1.5">
                   {isSubmitting ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Menyimpan...</span>
-                    </>
+                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /><span>Menyimpan...</span></>
                   ) : (
-                    <span>Simpan Perubahan</span>
+                    <span>Simpan</span>
                   )}
                 </Button>
               </div>

@@ -1,10 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Camera, ScanFace, Activity, CheckCircle2, RefreshCw } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 interface LiveCameraProps {
   onLog?: (mode: "checkIn" | "checkOut", name: string, status?: string) => void;
@@ -23,7 +21,6 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // FPS Counter
   useEffect(() => {
     let frameCount = 0;
     let lastTime = performance.now();
@@ -53,7 +50,6 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
     return () => clearInterval(timeInterval);
   }, []);
 
-  // Setup Kamera
   useEffect(() => {
     async function setupCamera() {
       try {
@@ -79,7 +75,6 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
     };
   }, []);
 
-  // Fungsi Scan Wajah (Bisa dipanggil otomatis maupun via tombol manual)
   const performScan = useCallback(async () => {
     if (!videoRef.current || !canvasRef.current || isScanning || isSuccess) return;
     
@@ -99,44 +94,34 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
       canvas.toBlob(async (blob) => {
         if (blob) {
           const startTime = performance.now();
+          const formData = new FormData();
+          formData.append("file", blob, "scan.jpg");
+          
           try {
-            const formData = new FormData();
-            formData.append("photo", blob, "face.jpg");
-            formData.append("scanMode", scanMode);
-
-            const response = await fetch("/api/absen", {
+            const res = await fetch("/api/absen", {
               method: "POST",
               body: formData,
             });
-
+            const data = await res.json();
+            
             setLatency(Math.round(performance.now() - startTime));
-
-            if (response.ok) {
-              const data = await response.json();
-              const prefix = data.alreadyChecked ? "SUDAH ABSEN" : "COCOK";
-              setStatusMessage(`${prefix}: ${data.user.name} (${data.status})`);
+            
+            if (data.success) {
               setIsSuccess(true);
+              setStatusMessage("VERIFIKASI BERHASIL");
               
               if (onLog) {
-                onLog(scanMode, data.user.name, data.status);
+                onLog(scanMode, data.data.name, data.data.status);
               }
 
-              // Auto-reset setelah 3.5 detik agar siap untuk orang berikutnya
               setTimeout(() => {
                 setIsSuccess(false);
                 setStatusMessage("MENUNGGU SUBJEK");
-              }, 3500);
-
+              }, 3000);
             } else {
-              try {
-                const errorData = await response.json();
-                setStatusMessage(errorData.error ? errorData.error.toUpperCase() : "TIDAK DIKENALI");
-              } catch {
-                setStatusMessage("TIDAK DIKENALI");
-              }
-              
+              setStatusMessage(data.error?.toUpperCase() || "WAJAH TIDAK DIKENALI");
               setTimeout(() => {
-                setStatusMessage(prev => (prev.startsWith("COCOK") || prev.startsWith("SUDAH")) ? prev : "MENUNGGU SUBJEK");
+                setStatusMessage("MENUNGGU SUBJEK");
               }, 3000);
             }
           } catch (error) {
@@ -154,7 +139,6 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
     }
   }, [isScanning, isSuccess, onLog, scanMode]);
 
-  // Auto scan setiap 3.5 detik jika tidak sedang sukses atau memproses
   useEffect(() => {
     if (isSuccess) return;
 
@@ -166,136 +150,113 @@ export function LiveCamera({ onLog }: LiveCameraProps = {}) {
   }, [isSuccess, performScan]);
 
   return (
-    <Card className="bg-white border border-blue-100 shadow-md hover:shadow-lg overflow-hidden transition-all duration-300 relative group rounded-2xl">
-      <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-blue-100 bg-slate-50/50 relative z-10 px-5">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm border border-blue-200">
-            <Camera className="w-5 h-5" />
-          </div>
-          <div>
-            <CardTitle className="text-sm font-extrabold tracking-tight text-blue-950">KAMERA TERMINAL</CardTitle>
-            <p className="text-[11px] font-mono text-blue-600 font-semibold">NVIDIA JETSON AI • CAM_01</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2.5 bg-blue-50/80 px-3 py-1.5 rounded-full border border-blue-200/80 shadow-sm">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className={cn("absolute inline-flex h-full w-full rounded-full opacity-75", isSuccess ? "bg-emerald-500 animate-none" : "bg-blue-500 animate-ping")}></span>
-            <span className={cn("relative inline-flex rounded-full h-2.5 w-2.5", isSuccess ? "bg-emerald-500" : "bg-blue-600")}></span>
-          </span>
-          <span className={cn("text-[11px] font-mono font-bold tracking-wider", isSuccess ? "text-emerald-700" : "text-blue-800")}>
-            {isSuccess ? "VERIFIKASI SUKSES" : "SIAP SCAN (STANDBY)"}
-          </span>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="p-0 relative z-10">
-        <div className="relative w-full aspect-video bg-slate-950 flex items-center justify-center overflow-hidden">
-          
-          {/* Feed Video Asli */}
-          <video 
-            ref={videoRef} 
-            autoPlay 
-            playsInline 
-            muted 
-            className={cn("absolute inset-0 w-full h-full object-cover transition-opacity duration-700", isSuccess ? "opacity-50" : "opacity-90")}
-          />
-          <canvas ref={canvasRef} className="hidden" />
-
-          {/* Grid Pattern Latar Belakang */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.15)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-
-          {/* Target Face Guide Tengah */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-56 rounded-3xl border-2 border-dashed border-blue-400/50 pointer-events-none flex items-center justify-center">
-            <div className="w-full h-[1px] bg-blue-400/20 absolute"></div>
-            <div className="w-[1px] h-full bg-blue-400/20 absolute"></div>
-          </div>
-
-          {/* Efek Radar Menyapu */}
-          {!isSuccess && (
-             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_15px_rgba(59,130,246,0.9)] opacity-80 animate-[scan_3s_ease-in-out_infinite]" />
-          )}
-
-          {/* Overlay Status Box */}
-          <div className="absolute z-20 backdrop-blur-md bg-slate-950/60 px-6 py-3.5 rounded-2xl border border-white/20 flex flex-col items-center gap-2 shadow-2xl pointer-events-none max-w-[85%]">
-             {isSuccess ? (
-                <CheckCircle2 className="w-10 h-10 text-emerald-400 animate-bounce drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-             ) : (
-                <ScanFace className={cn("w-10 h-10 transition-all duration-300", isScanning ? "text-yellow-400 animate-pulse scale-110" : "text-blue-300")} />
-             )}
-             <p className={cn("text-xs font-mono tracking-wider font-extrabold drop-shadow text-center", isSuccess ? "text-emerald-300" : (isScanning ? "text-yellow-300" : "text-white"))}>
-                {statusMessage}
-             </p>
-          </div>
-
-          {/* Overlay Data Teknis */}
-          <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end pointer-events-none z-30">
-            <div className="flex flex-col gap-1 text-[9px] font-mono text-white/90 font-bold">
-              <div className="flex items-center gap-2">
-                <Activity className={cn("w-3 h-3", isSuccess ? "text-emerald-400" : "animate-pulse text-blue-400")} />
-                <span className="bg-slate-900/80 px-2 py-0.5 rounded border border-white/10 backdrop-blur-sm">AI ENGINE: BUFFALO_L</span>
-              </div>
-              <div className="flex gap-2 px-1">
-                <span className="text-white/70">FPS: {fps}</span>
-                <span className="text-white/70">LATENCY: {latency > 0 ? `${latency}ms` : "---"}</span>
-              </div>
-            </div>
-            
-            <div className="text-[10px] font-mono text-yellow-400 font-extrabold bg-slate-900/80 px-2 py-1 rounded border border-white/10 backdrop-blur-sm">
-               {currentTime || "MENYINKRONKAN..."}
-            </div>
-          </div>
-        </div>
-      </CardContent>
-      
-      {/* Panel Kontrol Mode & Tombol Trigger Scan Manual */}
-      <div className="border-t border-blue-100 bg-slate-50/70 p-4 relative z-10 flex flex-wrap items-center justify-between gap-3">
-        {/* Pilihan Mode Masuk / Keluar */}
+    <div className="border border-border bg-card flex flex-col">
+      <div className="flex flex-row items-center justify-between p-3 border-b border-border">
         <div className="flex items-center gap-2">
+          <Camera className="w-4 h-4 text-muted-foreground" />
+          <div>
+            <h3 className="text-xs font-semibold text-foreground tracking-widest uppercase">Kamera Terminal</h3>
+            <p className="text-[10px] font-mono text-muted-foreground">JETSON AI CAM_01</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 border border-border px-2 py-1">
+          <span className={w-1.5 h-1.5 {isSuccess ? "bg-primary" : "bg-muted-foreground"}}></span>
+          <span className={	ext-[10px] font-mono font-bold tracking-widest uppercase {isSuccess ? "text-primary" : "text-muted-foreground"}}>
+            {isSuccess ? "SUKSES" : "STANDBY"}
+          </span>
+        </div>
+      </div>
+      
+      <div className="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden border-b border-border">
+        <video 
+          ref={videoRef} 
+          autoPlay 
+          playsInline 
+          muted 
+          className={bsolute inset-0 w-full h-full object-cover transition-opacity duration-700 {isSuccess ? "opacity-50" : "opacity-90"}}
+        />
+        <canvas ref={canvasRef} className="hidden" />
+
+        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-48 border border-white/20 pointer-events-none flex items-center justify-center">
+          <div className="w-4 h-4 border-t border-l border-primary absolute top-0 left-0"></div>
+          <div className="w-4 h-4 border-t border-r border-primary absolute top-0 right-0"></div>
+          <div className="w-4 h-4 border-b border-l border-primary absolute bottom-0 left-0"></div>
+          <div className="w-4 h-4 border-b border-r border-primary absolute bottom-0 right-0"></div>
+        </div>
+
+        {!isSuccess && (
+           <div className="absolute top-0 left-0 w-full h-0.5 bg-primary/80 animate-[scan_3s_ease-in-out_infinite]" />
+        )}
+
+        <div className="absolute z-20 bg-black/60 px-4 py-2 border border-white/20 flex flex-col items-center gap-1 pointer-events-none">
+           {isSuccess ? (
+              <CheckCircle2 className="w-6 h-6 text-primary" />
+           ) : (
+              <ScanFace className={w-6 h-6 transition-all duration-300 {isScanning ? "text-primary" : "text-muted-foreground"}} />
+           )}
+           <p className={	ext-[10px] font-mono tracking-widest font-bold text-center {isSuccess ? "text-primary" : (isScanning ? "text-primary" : "text-white")}}>
+              {statusMessage}
+           </p>
+        </div>
+
+        <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end pointer-events-none z-30">
+          <div className="flex flex-col gap-0.5 text-[9px] font-mono text-white/90">
+            <div className="flex items-center gap-1.5 bg-black/80 px-1.5 py-0.5 border border-white/10">
+              <Activity className={w-2.5 h-2.5 {isSuccess ? "text-primary" : "text-muted-foreground"}} />
+              <span>ENGINE: BUFFALO_L</span>
+            </div>
+            <div className="flex gap-1">
+              <span className="bg-black/80 px-1.5 py-0.5 border border-white/10">FPS:{fps}</span>
+              <span className="bg-black/80 px-1.5 py-0.5 border border-white/10">LAT:{latency > 0 ? latency : "0"}ms</span>
+            </div>
+          </div>
+          
+          <div className="text-[10px] font-mono text-primary font-bold bg-black/80 px-1.5 py-0.5 border border-white/10">
+             {currentTime || "SYNC..."}
+          </div>
+        </div>
+      </div>
+      
+      <div className="p-3 bg-card flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             onClick={() => setScanMode("checkIn")}
             disabled={isSuccess || isScanning}
-            className={cn(
-              "px-4 py-2 rounded-xl font-bold text-xs tracking-wide transition-all duration-200 border disabled:opacity-50",
+            className={lex-1 sm:flex-none px-3 py-1.5 text-[10px] font-mono font-bold tracking-widest uppercase border transition-colors {
               scanMode === "checkIn" 
-                ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20" 
-                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
-            )}
+                ? "bg-primary text-primary-foreground border-primary" 
+                : "bg-background text-muted-foreground border-border hover:bg-muted"
+            }}
           >
-            MODE: MASUK
+            IN
           </button>
           <button
             onClick={() => setScanMode("checkOut")}
             disabled={isSuccess || isScanning}
-            className={cn(
-              "px-4 py-2 rounded-xl font-bold text-xs tracking-wide transition-all duration-200 border disabled:opacity-50",
+            className={lex-1 sm:flex-none px-3 py-1.5 text-[10px] font-mono font-bold tracking-widest uppercase border transition-colors {
               scanMode === "checkOut" 
-                ? "bg-amber-600 text-white border-amber-600 shadow-md shadow-amber-600/20" 
-                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
-            )}
+                ? "bg-primary text-primary-foreground border-primary" 
+                : "bg-background text-muted-foreground border-border hover:bg-muted"
+            }}
           >
-            MODE: KELUAR
+            OUT
           </button>
         </div>
 
-        {/* Tombol Manual Ambil Foto & Scan */}
         <Button
           onClick={performScan}
           disabled={isScanning || isSuccess}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2 h-auto rounded-xl shadow-md shadow-blue-600/25 flex items-center gap-2 transition-all active:scale-95"
+          className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-[10px] font-bold px-4 h-8 uppercase tracking-widest gap-2"
         >
           {isScanning ? (
-            <>
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              <span>Memproses...</span>
-            </>
+            <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> PROSES...</>
           ) : (
-            <>
-              <ScanFace className="w-4 h-4 text-yellow-300" />
-              <span>Scan Wajah Sekarang</span>
-            </>
+            <><ScanFace className="w-3.5 h-3.5" /> MANUAL SCAN</>
           )}
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }
