@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LiveCamera } from "./live-camera";

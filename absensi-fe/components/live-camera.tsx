@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Camera, ScanFace, Activity, CheckCircle2, RefreshCw } from "lucide-react";

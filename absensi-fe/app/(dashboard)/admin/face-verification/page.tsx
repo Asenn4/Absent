@@ -1,4 +1,4 @@
-﻿import prisma from "@/lib/prisma"
+import prisma from "@/lib/prisma"
 import { FaceVerificationTable } from "./components/face-verification-table"
 
 export const metadata = {
